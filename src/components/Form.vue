@@ -6,6 +6,8 @@
         <template v-if="barItems">
             <Bar :items="barItems"></Bar>
             <SalaryTable :items="tableItems"></SalaryTable>
+            <SalaryTable :items="tableItemsB"></SalaryTable>
+            <Description :description="calculator.description"></Description>
         </template>
 
     </div>
@@ -22,6 +24,7 @@ import Button from './Button.vue';
 import Checkbox from './Checkbox.vue';
 import SalaryTable from './Table.vue';
 import { BarItem, TableItem } from '@/types';
+import Description from './Description.vue';
 
 
 @Options({
@@ -30,6 +33,7 @@ import { BarItem, TableItem } from '@/types';
     Button,
     Checkbox,
     SalaryTable,
+    Description,
   },
   watch: {
     salary: function(){ this.onUpdateInput() }
@@ -43,7 +47,8 @@ export default class Form extends Vue {
     calculator = new IRPF(configs[0]);
 
     barItems: BarItem[] = [];
-     tableItems: TableItem[] = [];
+    tableItems: TableItem[] = [];
+    tableItemsB: TableItem[] = [];
 
     mounted(){
 
@@ -75,10 +80,13 @@ export default class Form extends Vue {
             {name: "Porcentaje IRPF en nómina", value: this.calculator.irpf_porcentaje.toFixed(2) + '%'},
             {name: "Sueldo neto", value: this.calculator.neto.toFixed(2) + ' €'},
             {name: "Sueldo neto mensual", value: this.calculator.neto_mes.toFixed(2) + ' €'},
-            
+        ]
+
+        this.tableItemsB = [
             {name: "Total empresa", value: this.calculator.total_empresa.toFixed(2) + ' €'},
             {name: "Total estado", value: this.calculator.dinero_estado.toFixed(2) + ' €'},
         ]
+
 
         this.calculated = true;
 

@@ -22,7 +22,7 @@ class Props {
 }
 
 @Options({})
-export default class Checkbox extends Vue.with(Props) {
+export default class Table extends Vue.with(Props) {
 
 
 }
@@ -34,7 +34,7 @@ export default class Checkbox extends Vue.with(Props) {
 .salarytable {
   display: flex;
   flex-direction: column;
-  background: lightgrey;
+  background: rgb(233, 247, 231);
   margin-top: 10px;
   padding: 10px;
   gap: 5px
@@ -48,6 +48,8 @@ export default class Checkbox extends Vue.with(Props) {
 .salarytable .row .value {
   text-align: right;
   flex-grow: 1;
+  font-weight: bold;
+  color: rgb(30, 73, 25);
 }
 
 

@@ -20,8 +20,10 @@ export type Config = {
     // Seguridad Social
     //
 
-    // Base máxima para el grupo 1
-    // https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537?changeLanguage=es
+    /** 
+     * Base máxima para el grupo 1
+     * https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537?changeLanguage=es
+     */
     base_maxima: number,
     tipos: Tipo[],
 
