@@ -1,7 +1,7 @@
 <template>
     <div class="bar">
 
-        <div v-for="b in items" :key="b.name" class="item" :style="{'flex-grow': Math.floor(b.amount)}">
+        <div v-for="b in items?.filter(x => x.amount > 0)" :key="b.name" class="item" :style="{'flex-grow': Math.floor(b.amount)}">
 
             <div class="content">
                 <div class="name">{{b.name}}</div>
