@@ -6,22 +6,10 @@
 </template>
   
   
-<script lang="ts">
+<script setup lang="ts">
 
-import { Options, Vue, prop } from 'vue-class-component';
-
-class Props {
-    disabled = prop({default: false})
-}
-
-@Options({})
-export default class Checkbox extends Vue.with(Props) {
-
-
-}
 
 </script>
-
 
 
 <style scoped>/* Customize the label (the container) */

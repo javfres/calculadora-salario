@@ -16,24 +16,19 @@
 </template>
   
   
-<script lang="ts">
+<script setup lang="ts">
 
 import { BarItem } from '@/types';
-import { Options, Vue, prop } from 'vue-class-component';
 
 
-class Props {
-  items?: BarItem[];
-  level = prop({default: 1})
+interface Props {
+    items: BarItem[];
+    level?: number;
 }
 
-@Options({
+const props = withDefaults(defineProps<Props>(), {
+    level: () => 1
 })
-export default class Bar extends Vue.with(Props) {
-
-
-
-}
 
 
 </script>

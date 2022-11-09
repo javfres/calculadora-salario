@@ -10,46 +10,42 @@
 </template>
   
   
-<script lang="ts">
+<script setup lang="ts">
 
-import { Options, Vue } from 'vue-class-component';
 
 import { TableItem } from '@/types';
 
 
-class Props {
-    items?: TableItem[]
+interface Props {
+    items: TableItem[]
 }
 
-@Options({})
-export default class Table extends Vue.with(Props) {
+defineProps<Props>()
 
-
-}
 
 </script>
 
 
 <style scoped>
 .salarytable {
-  display: flex;
-  flex-direction: column;
-  background: rgb(233, 247, 231);
-  margin-top: 10px;
-  padding: 10px;
-  gap: 5px
+    display: flex;
+    flex-direction: column;
+    background: rgb(233, 247, 231);
+    margin-top: 10px;
+    padding: 10px;
+    gap: 5px
 }
 
 .salarytable .row {
-  display: flex;
-  flex-direction: row;
+    display: flex;
+    flex-direction: row;
 }
 
 .salarytable .row .value {
-  text-align: right;
-  flex-grow: 1;
-  font-weight: bold;
-  color: rgb(30, 73, 25);
+    text-align: right;
+    flex-grow: 1;
+    font-weight: bold;
+    color: rgb(30, 73, 25);
 }
 
 

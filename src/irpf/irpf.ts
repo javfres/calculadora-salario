@@ -44,7 +44,10 @@ export default class CalculadoraSalario {
         this.config = config;
     }
 
-    calcular(brutoA:number, brutoB:number, configContribuyente: ConfigContribuyente = {}) {
+    calcular(configContribuyente: ConfigContribuyente) {
+
+        const bruto_a = configContribuyente.salarioA;
+        const bruto_b = configContribuyente.salarioB;
 
         const has_b = situaciones.find(s => s.id === configContribuyente.situacion_id)!.has_b;
 
@@ -54,8 +57,8 @@ export default class CalculadoraSalario {
         //
         // Bruto
         //
-        const d_brutoA = D(brutoA);
-        const d_brutoB = D(brutoB)
+        const d_brutoA = D(bruto_a);
+        const d_brutoB = D(bruto_b)
         const d_bruto = d_brutoA.add(d_brutoB);
 
         if(!has_b){
@@ -95,7 +98,7 @@ export default class CalculadoraSalario {
 
             if(!isA && !has_b) return;
             
-            const bruto = isA ? brutoA : brutoB;
+            const bruto = isA ? bruto_a : bruto_b;
 
             // Base sobre la que se aplican los porcentajes
             const d_base_seguridad_social = D(

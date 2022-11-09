@@ -17,9 +17,11 @@ export type Tramo = {
 }
 
 export type ConfigContribuyente = {
+    salarioA: number;
+    salarioB: number;
+    situacion_id: situacion_id_t;
     edad?: number;
     hijos?: number;
-    situacion_id?: situacion_id_t;
 }
 
 export interface Config {
