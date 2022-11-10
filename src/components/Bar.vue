@@ -15,10 +15,17 @@
     </div>
 </template>
   
+<script lang="ts">
+
+export type BarItem = {
+    name: string,
+    amount: number,
+    subitems?: BarItem[]
+}
+
+</script>
   
 <script setup lang="ts">
-
-import { BarItem } from '@/types';
 
 
 interface Props {

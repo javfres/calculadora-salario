@@ -3,8 +3,8 @@
     
         <template v-if="barItems">
             <Bar :items="barItems"></Bar>
-            <SalaryTable :items="tableItems"></SalaryTable>
-            <SalaryTable :items="tableItemsB"></SalaryTable>
+            <SalaryTable :table="tables.empleado"></SalaryTable>
+            <SalaryTable :table="tables.empresa"></SalaryTable>
             <Description :description="calculator.description"></Description>
         </template>
 
@@ -16,11 +16,10 @@
 
 import IRPF from '../irpf/irpf';
 import {ConfigContribuyente, configs, getSituacionFromID} from '../irpf/config/config';
-import Bar from './Bar.vue';
-import SalaryTable from './Table.vue';
-import { BarItem, TableItem } from '@/types';
+import Bar, {BarItem} from './Bar.vue';
+import SalaryTable, { Table2 } from './Table.vue';
 import Description from './Description.vue';
-import { computed, ref, Ref, toRef, watch } from 'vue';
+import { computed, reactive, ref, Ref, toRef, watch } from 'vue';
 
 
 export interface Props {
@@ -32,8 +31,12 @@ const props = defineProps<Props>();
 const calculator = new IRPF(configs[0])
 
 const barItems: Ref<BarItem[]> = ref([]);
-const tableItems: Ref<TableItem[]> = ref([]);
-const tableItemsB: Ref<TableItem[]> = ref([]);
+
+const tables = reactive({
+    empleado: new Table2(),
+    empresa: new Table2(),
+})
+
 
 const situacion = computed(() => getSituacionFromID(props.config.situacion_id))
 
@@ -52,71 +55,65 @@ function onUpdateConfig(config: ConfigContribuyente){
     if(!has_b){
 
         const empleado = [
-            {name: "Seguridad Social", amount: calculator.seguridad_social_a},
+            {name: "Seguridad Social", amount: calculator.a.seguridad_social},
             {name: "IRPF", amount: calculator.irpf},
-            {name: "Neto", amount: calculator.neto},
+            {name: "Neto", amount: calculator.a.neto},
         ]
 
         barItems.value = [
-            {name: "Seguridad Social Empresa", amount: calculator.seguridad_social_empresa_a},
-            {name: "Bruto para empleado", amount: calculator.bruto_a, subitems: empleado},
+            {name: "Seguridad Social Empresa", amount: calculator.a.seguridad_social_empresa},
+            {name: "Bruto para empleado", amount: calculator.a.bruto, subitems: empleado},
         ]
 
-        tableItems.value = [
-            {name: "Sueldo bruto", value: calculator.bruto_total.toFixed(2) + ' €'},
-            {name: "Contribución Seguridad Social", value: calculator.seguridad_social_a.toFixed(2) + ' €'},
-            {name: "Retención IRPF", value: calculator.irpf.toFixed(2) + ' €'},
-            {name: "Porcentaje IRPF en nómina", value: calculator.irpf_porcentaje.toFixed(2) + '%'},
-            {name: "Sueldo neto", value: calculator.neto.toFixed(2) + ' €'},
-            {name: "Sueldo neto mensual", value: calculator.neto_mes_a.toFixed(2) + ' €'},
-        ]
+        let t: Table2;
 
-        tableItemsB.value = [
-            {name: "Total empresa", value: calculator.total_empresa_a.toFixed(2) + ' €'},
-            {name: "Total estado", value: calculator.dinero_estado.toFixed(2) + ' €'},
-        ]
+        t = new Table2()
+        t.row("Sueldo bruto").eur().value(calculator.a.bruto)
+        t.row("Contribución Seguridad Social").eur().value(calculator.a.seguridad_social)
+        t.row("Retención IRPF").eur().value(calculator.irpf)
+        t.row("Porcentaje IRPF en nómina").per().value(calculator.irpf_porcentaje)
+        t.row("Sueldo neto").eur().value(calculator.a.neto)
+        t.row("Sueldo neto mensual").eur().value(calculator.a.neto_mes)
+        tables.empleado = t;
 
+        t = new Table2()
+        t.row("Total empresa").eur().value(calculator.a.total_empresa)
+        t.row("Total estado").eur().value(calculator.dinero_estado)
+        tables.empresa = t;
 
     } else {
 
         const empleado = [
-            {name: "SS A", amount: calculator.seguridad_social_a},
-            {name: "SS B", amount: calculator.seguridad_social_b},
+            {name: "SS A", amount: calculator.a.seguridad_social},
+            {name: "SS B", amount: calculator.b.seguridad_social},
             {name: "IRPF", amount: calculator.irpf},
-            {name: "Neto", amount: calculator.neto},
+            {name: "Neto A", amount: calculator.a.neto},
+            {name: "Neto B", amount: calculator.b.neto},
         ]
 
         barItems.value = [
-            {name: "SS Empresa A", amount: calculator.seguridad_social_empresa_a},
-            {name: "SS Empresa B", amount: calculator.seguridad_social_empresa_b},
-            {name: "Bruto conjunta", amount: calculator.bruto_total, subitems: empleado},
+            {name: "SS Empresa A", amount: calculator.a.seguridad_social_empresa},
+            {name: "SS Empresa B", amount: calculator.b.seguridad_social_empresa},
+            {name: "Bruto conjunto", amount: calculator.bruto_total, subitems: empleado},
         ]
 
-        tableItems.value = [
-            {name: "Sueldo bruto A", value: calculator.bruto_a.toFixed(2) + ' €'},
-            {name: "Contribución Seguridad Social A", value: calculator.seguridad_social_a.toFixed(2) + ' €'},
+        let t: Table2;
 
-            {name: "Sueldo bruto B", value: calculator.bruto_b.toFixed(2) + ' €'},
-            {name: "Contribución Seguridad Social B", value: calculator.seguridad_social_b.toFixed(2) + ' €'},
+        t = new Table2()
+        t.row("Sueldo bruto").eur().value(calculator.a.bruto).value(calculator.b.bruto)
+        t.row("Contribución Seguridad Social").eur().value(calculator.a.seguridad_social).value(calculator.b.seguridad_social)
+        t.row("Retención IRPF").eur().value(calculator.irpf)
+        t.row("Porcentaje IRPF en nómina").per().value(calculator.irpf_porcentaje)
+        t.row("Sueldo neto total").eur().value(calculator.neto_total)
+        t.row("Sueldo neto").eur().value(calculator.a.neto).value(calculator.b.neto)
+        t.row("Sueldo neto mensual").eur().value(calculator.a.neto_mes).value(calculator.b.neto_mes)
+        tables.empleado = t;
 
+        t = new Table2()
+        t.row("Total empresa").eur().value(calculator.a.total_empresa).value(calculator.b.total_empresa)
+        t.row("Total estado").eur().value(calculator.dinero_estado)
+        tables.empresa = t;
 
-            {name: "Retención IRPF", value: calculator.irpf.toFixed(2) + ' €'},
-            {name: "Porcentaje IRPF en nómina", value: calculator.irpf_porcentaje.toFixed(2) + '%'},
-
-            {name: "Sueldo neto total", value: calculator.neto.toFixed(2) + ' €'},
-
-            {name: "Sueldo neto A", value: calculator.neto_a.toFixed(2) + ' €'},
-            {name: "Sueldo neto B", value: calculator.neto_b.toFixed(2) + ' €'},
-
-            {name: "Sueldo neto mensual A", value: calculator.neto_mes_a.toFixed(2) + ' €'},
-            {name: "Sueldo neto mensual B", value: calculator.neto_mes_b.toFixed(2) + ' €'},
-        ]
-
-        tableItemsB.value = [
-            {name: "Total empresa A", value: calculator.total_empresa_a.toFixed(2) + ' €'},
-            {name: "Total empresa B", value: calculator.total_empresa_b.toFixed(2) + ' €'},
-            {name: "Total estado", value: calculator.dinero_estado.toFixed(2) + ' €'},
-        ]
 
     }
 
