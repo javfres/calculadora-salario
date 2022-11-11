@@ -29,7 +29,6 @@ export interface Config {
     /** El año de la configuración */
     year(): number;
 
-
     //
     // Seguridad Social
     //

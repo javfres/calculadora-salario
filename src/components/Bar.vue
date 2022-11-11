@@ -27,63 +27,59 @@ export type BarItem = {
   
 <script setup lang="ts">
 
-
 interface Props {
     items: BarItem[];
     level?: number;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
     level: () => 1
 })
-
 
 </script>
 
 
-
 <style scoped>
 
-    .bar {
-        display: flex;
-        flex-direction: row;
-        width: 100%;
-        gap: 4px;
-    }
+.bar {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 4px;
+}
 
-    .item {
-        display: flex;
-        flex-direction: column;
-        flex-basis: 0;
-        flex-shrink: 1;
-        gap: 10px;
-    }
+.item {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 0;
+    flex-shrink: 1;
+    gap: 10px;
+}
+.content {
+    background: lightblue;
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    padding: 6px;
+}
 
-    .content {
-        background: lightblue;
-        display: flex;
-        flex-direction: column;
-        align-items: end;
-        padding: 6px;
-    }
+.name {
+    text-align: right;
+    text-overflow:ellipsis;
+    height: 20px;
+    font-size: 8pt;
+}
 
-    .name {
-        text-align: right;
-        text-overflow:ellipsis;
-        height: 20px;
-        font-size: 8pt;
-    }
+.amount {
+    overflow:hidden;
+    margin-top: 10px;
+    height: 20px;
+    font-size: 10pt;
+    white-space: nowrap;
+}
 
-    .amount {
-        overflow:hidden;
-        margin-top: 10px;
-        height: 20px;
-        font-size: 10pt;
-        white-space: nowrap;
-    }
-
-    .content .content {
-        background: lightcoral;
-    }
+.content .content {
+    background: lightcoral;
+}
 
 </style>

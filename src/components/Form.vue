@@ -1,21 +1,31 @@
 <template>
     <div class="theform">
     
-        Situación
-        <select v-model="state.situacion_id">
-            <option v-for="sit of situaciones" :key="sit.id" :value="sit.id">
-                {{ sit.name }}
-            </option>
-        </select>
-        <br>
-        Bruto anual:
-        <input type="number" v-model="state.salary_a" step="1000" min="0">
-        <input type="number" v-model="state.salary_b" step="1000" min="0" v-if="state.situacion_id === 'matri-conj'">
-        <br>
-        Edad: <input type="number" v-model="state.edad" step="1" min="1"> <br>
+        <div class="thelabel">Situación</div>
+        <div class="theinput">
+            <select v-model="state.situacion_id">
+                <option v-for="sit of situaciones" :key="sit.id" :value="sit.id">
+                    {{ sit.name }}
+                </option>
+            </select>
+        </div> 
+
+        <div class="thelabel">Bruto anual</div>
+        <div class="theinput">
+            <input type="number" v-model="state.salary_a" step="1000" min="0">
+            <input type="number" v-model="state.salary_b" step="1000" min="0" v-if="state.situacion_id === 'matri-conj'">
+        </div>  
+        
+        <div class="thelabel">Edad</div>
+        <div class="theinput">
+            <input type="number" v-model="state.edad" step="1" min="1">
+        </div> 
 
         <template v-if="situacion?.has_hijos">
-            Hijos: <input type="number" v-model="state.hijos" step="1" :min="situacion.min_hijos">
+            <div class="thelabel">Hijos</div>
+            <div class="theinput">
+                <input type="number" v-model="state.hijos" step="1" :min="situacion.min_hijos">
+            </div> 
         </template>
 
     </div>
@@ -38,7 +48,7 @@ interface State {
 }
 
 const state = reactive<State>({
-    situacion_id: situaciones[1].id,
+    situacion_id: situaciones[0].id,
     salary_a: 20000,
     salary_b: 0,
     edad: 30,
@@ -100,10 +110,39 @@ watch(() => state.hijos, onUpdateInput)
 
 
 
-<style scoped>
+<style lang="scss" scoped>
 
-input {
-    margin-bottom: 10px;
+.theform {
+
+    display: grid;
+    grid-template-columns: auto 1fr;
+    margin-bottom: 30px;
+
+    //background-color: rgb(232, 232, 232);
+    padding: 10px;
+
+    .thelabel {
+        grid-column-start: 1;
+        grid-column-end: 2;
+        margin-top: auto;
+        margin-bottom: auto;
+        margin-right: 16px;
+        text-align: right;
+    }
+
+    .theinput {
+        grid-column-start: 2;
+        grid-column-end: 3;
+        display: flex;
+        gap: 10px;
+
+        input, select {
+            padding: 10px 10px;
+            margin: 4px 0;
+            box-sizing: border-box;
+            flex: 1;
+        }
+    }
 }
 
 </style>

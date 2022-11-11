@@ -44,7 +44,7 @@ export default class CalculadoraSalario {
         const bruto_a = configContribuyente.salarioA;
         const bruto_b = configContribuyente.salarioB;
 
-        const has_b = situaciones.find(s => s.id === configContribuyente.situacion_id)!.has_b;
+        const has_b = situaciones.find(s => s.id === configContribuyente.situacion_id)?.has_b ?? false;
 
         // Create a new description object
         this.description = new Description();
@@ -57,14 +57,14 @@ export default class CalculadoraSalario {
         const d_bruto_total = d_bruto_a.add(d_bruto_b);
 
         if(!has_b){
-            this.description.add().text("El sueldo bruto es de").euros(d_bruto_total);
+            this.description.line().text("El sueldo bruto es de").euros(d_bruto_total);
             this.a.bruto = d_bruto_total.toRoundedUnit(2);
             this.b.bruto = 0;
             this.bruto_total = d_bruto_total.toRoundedUnit(2);
         } else {
-            this.description.add()
+            this.description.line()
                 .text("El sueldo bruto A es de").euros(d_bruto_a).coma()
-                .text("El sueldo bruto B es de").euros(d_bruto_b).dot()
+                .text("el sueldo bruto B es de").euros(d_bruto_b).dot()
                 .text("El sueldo bruto total es de").euros(d_bruto_total)
             this.a.bruto = d_bruto_a.toRoundedUnit(2);
             this.b.bruto = d_bruto_b.toRoundedUnit(2);
@@ -76,15 +76,18 @@ export default class CalculadoraSalario {
         //
         let d_seguridad_social_ab = D(0);
         let d_seguridad_social_a = D(0);
-        let d_seguridad_social_b = D(0);
         let d_seguridad_social_empresa_a = D(0);
         let d_seguridad_social_empresa_b = D(0);
+
+        this.description.line().text("Calculo de la seguridad social:")
+        this.description.startGroup();
 
         ["A", "B"].forEach(person => {
             const isA = person === "A";
 
             if(has_b) {
-                this.description.add().text("Calculo para " + person).symbol(":");
+                this.description.line().text("Calculo para " + person).symbol(":");
+                this.description.startGroup()
             }
 
             if(!isA && !has_b) return;
@@ -96,7 +99,7 @@ export default class CalculadoraSalario {
                 Math.min(this.config.base_maxima() * 12, bruto)
             );
 
-            const line = this.description.add()
+            const line = this.description.line()
                 .text("La base sobre la que se aplica el caculo de la cotización")
                 .text("de la Seguridad Social es")
                 .euros(d_base_seguridad_social)
@@ -116,7 +119,7 @@ export default class CalculadoraSalario {
                 const d_empleado = d_base_seguridad_social.multiply(tipo.porcentaje/100)
                 d_seguridad_social = d_seguridad_social.add(d_empleado)
 
-                this.description.add()
+                this.description.line()
                     .text("El empleado debe aportar")
                     .percentage(tipo.porcentaje)
                     .text("en concepto de")
@@ -126,7 +129,7 @@ export default class CalculadoraSalario {
                     .euros(d_empleado);
             }
 
-            this.description.add()
+            this.description.line()
                 .text("En total, la aportación a la seguridad social por el empleado es")
                 .euros(d_seguridad_social);
 
@@ -137,7 +140,7 @@ export default class CalculadoraSalario {
                 const d_empresa = d_base_seguridad_social.multiply(tipo.porcentaje_empresa/100)
                 d_seguridad_social_empresa = d_seguridad_social_empresa.add(d_empresa)
 
-                this.description.add()
+                this.description.line()
                     .text("La empresa debe aportar")
                     .percentage(tipo.porcentaje_empresa)
                     .text("en concepto de")
@@ -147,8 +150,8 @@ export default class CalculadoraSalario {
                     .euros(d_empresa);
             }
 
-            this.description.add()
-                .text("En total, la aportación a la seguridad social por la empresa es")
+            this.description.line()
+                .text("En total, la aportación a la seguridad social por la empresa es:")
                 .euros(d_seguridad_social_empresa);
 
             d_seguridad_social_ab = d_seguridad_social_ab.add(d_seguridad_social)
@@ -161,17 +164,23 @@ export default class CalculadoraSalario {
             } else {
                 this.b.seguridad_social = d_seguridad_social.toRoundedUnit(2);
                 this.b.seguridad_social_empresa = d_seguridad_social_empresa.toRoundedUnit(2);
-                d_seguridad_social_b = d_seguridad_social;
                 d_seguridad_social_empresa_b = d_seguridad_social_empresa;
+            }
+
+            if(has_b) {
+                this.description.endGroup()
             }
 
         });
 
-        
+        this.description.endGroup();
 
         //
         // Calculo IRPF
         //
+
+        this.description.line().text("Calculo del IRPF").symbol(":");
+        this.description.startGroup();
 
         // Quitar el mínimo personal
         const reducción = this.config.describe_minimo_contribuyente(configContribuyente, this.description);
@@ -183,7 +192,7 @@ export default class CalculadoraSalario {
             d_base_imponible = D(0);
         }
 
-        this.description.add()
+        this.description.line()
             .text("La base imponible sobre la que se aplica el IRPF es")
             .euros(d_base_imponible)
             .dot()
@@ -194,36 +203,49 @@ export default class CalculadoraSalario {
             .text("y la reducción correspondiente según la situación familiar")
             .euros(d_redución_irpf, {parenthesis: true})
 
-        this.description.add()
-            .text("Ahora se calcula los tramos del IRPF");
+        this.description.line()
+            .text("Ahora se calcula los tramos del IRPF").symbol(":");
+        this.description.startGroup()
 
         const d_irpf = this.calcularTramos(d_base_imponible);
         this.irpf = d_irpf.toRoundedUnit(2);
 
-        this.description.add()
+        this.description.line()
             .text("La retención total del IRPF es de")
             .euros(d_irpf);
+        this.description.endGroup()
 
 
         const d_neto_total = d_bruto_total.subtract(d_seguridad_social_ab).subtract(d_irpf);
         this.neto_total = d_neto_total.toRoundedUnit(2);
         this.a.neto = d_neto_total.toRoundedUnit(2);
 
-        this.description.add()
+        this.description.line()
             .text("El salario neto es por tanto de")
             .euros(d_neto_total);
 
 
         this.irpf_porcentaje = 100 * d_irpf.toUnit() / d_bruto_total.subtract(d_seguridad_social_ab).toUnit()
 
-        this.description.add()
+        this.description.line()
             .text("Lo que corresponde a un porcentaje de IRPF en nómina de")
             .percentage(this.irpf_porcentaje);
+
+        this.description.endGroup();
+
+
+        //
+        // Neto
+        //
+
+        this.description.line().text("Calculo del sueldo neto").symbol(":");
+        this.description.startGroup();
+
 
         if(!has_b){
             this.a.neto_mes = d_neto_total.divide(12).toRoundedUnit(2);
 
-            this.description.add()
+            this.description.line()
                 .text("El sueldo neto mensual es de")
                 .euros(this.a.neto_mes)
 
@@ -239,7 +261,7 @@ export default class CalculadoraSalario {
             this.a.neto = d_neto_a.toRoundedUnit(2);
             this.b.neto = d_neto_b.toRoundedUnit(2);
 
-            this.description.add()
+            this.description.line()
                 .text("El sueldo neto es de")
                 .euros(this.a.neto)
                 .text("y")
@@ -248,7 +270,7 @@ export default class CalculadoraSalario {
             this.a.neto_mes = d_neto_a.divide(12).toRoundedUnit(2);
             this.b.neto_mes = d_neto_b.divide(12).toRoundedUnit(2);
 
-            this.description.add()
+            this.description.line()
             .text("El sueldo neto mensual es de")
             .euros(this.a.neto_mes)
             .text("y")
@@ -256,19 +278,21 @@ export default class CalculadoraSalario {
 
         }
 
-
+        this.description.endGroup();
         
-
+        //
+        // Total empresa
+        //
 
         this.a.total_empresa = d_bruto_a.add(d_seguridad_social_empresa_a).toRoundedUnit(2);
         this.b.total_empresa = d_bruto_b.add(d_seguridad_social_empresa_b).toRoundedUnit(2);
 
         if(!has_b){
-            this.description.add()
+            this.description.line()
                 .text("La empresa tiene un coste total de")
                 .euros(this.a.total_empresa);
         } else {
-            this.description.add()
+            this.description.line()
                 .text("La empresa A tiene un coste total de")
                 .euros(this.a.total_empresa)
                 .coma()
@@ -276,13 +300,17 @@ export default class CalculadoraSalario {
                 .euros(this.b.total_empresa)
         }
 
+        //
+        // Total estado
+        //
+
         const d_estado = d_seguridad_social_ab
             .add(d_seguridad_social_empresa_a)
             .add(d_seguridad_social_empresa_b);
 
         this.dinero_estado = d_estado.add(d_irpf).toRoundedUnit(2);
 
-        this.description.add()
+        this.description.line()
             .text("El estado ingresa")
             .euros(d_estado)
             .text("en impuestos");
@@ -306,7 +334,7 @@ export default class CalculadoraSalario {
             const retencion = D(enTramo * (tramo.porcentaje / 100));
             retencionTotal = retencionTotal.add(retencion)
 
-            this.description.add()
+            this.description.line()
                 .text("En el tramo desde")
                 .euros(previo)
                 .text("a")

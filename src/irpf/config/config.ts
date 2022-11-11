@@ -18,5 +18,7 @@ export const situaciones = [
 export type situacion_id_t = typeof situaciones[number]['id']
 
 export function getSituacionFromID(id: situacion_id_t){
-    return situaciones.find(x => x.id === id)!;
+    const situacion = situaciones.find(x => x.id === id);
+    if(!situacion) throw new Error("unable to find situacion");
+    return situacion;
 }

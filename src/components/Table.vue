@@ -7,7 +7,6 @@
             <div class="value valueb title">B</div>
         </template>
     
-      
         <template v-for="row of table.rows" :key="row.id">
             <div class="entry">{{ row.name }}</div>
             <div class="value" :class="{unique: table.has_b&&!row.has_b}"> {{ row.a }}</div>
@@ -140,7 +139,6 @@ defineProps<Props>()
 
     &.hasb {
         grid-template-columns: 1fr auto auto auto auto;
-        //grid-template-columns: 1fr repeat(4, minmax(auto, 50px));
 
         .value {
 
@@ -163,21 +161,8 @@ defineProps<Props>()
             &.title {
                 text-align: center;
             }
-
         }
-
     }
-
-
-
 }
-
-
-
-
-
-
-
-
 
 </style>

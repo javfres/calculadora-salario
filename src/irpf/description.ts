@@ -13,14 +13,19 @@ type Item = {
 }
 
 
-export class Line {
+interface LineOrGroup {
+    isLine(): boolean;
+    isGroup(): boolean;
+}
 
-    id: number;
+export class Line implements LineOrGroup {
+
+    id: string;
 
     items: Item[] = [];
 
     constructor(id: number){
-        this.id = id;
+        this.id = "line-" + id;
     }
 
     private push(item: Partial<Item>): Line {
@@ -113,15 +118,70 @@ export class Line {
 
         return html;
     }
+
+    isLine(){
+        return true;
+    }
+
+    isGroup(){
+        return false;
+    }
+
 }
+
+export class Group implements LineOrGroup {
+
+    static id = 0;
+
+    id: string;
+    items: (Line|Group)[] = [];
+    parent?: Group;
+
+    constructor(parent?: Group){
+        this.id = "group-" + (++Group.id);
+        this.parent = parent;
+    }
+
+    line(): Line {
+        const l = new Line(this.items.length);
+        this.items.push(l);
+        return l;
+    }
+
+    group(): Group {
+        const g = new Group(this);
+        this.items.push(g);
+        return g;
+    }
+
+    isLine(){
+        return false;
+    }
+
+    isGroup(){
+        return true;
+    }
+}
+
 
 export class Description {
 
-    lines: Line[] = [];
+    readonly root = new Group();
+    private current = this.root;
 
-    add(): Line {
-        const it = new Line(this.lines.length);
-        this.lines.push(it);
-        return it;
+
+    startGroup(): Description {
+        this.current = this.current.group();
+        return this;
     }
+
+    endGroup(): Description {
+        this.current = this.current.parent ?? this.root;
+        return this;
+    }
+
+    line(): Line {
+        return this.current.line()
+    }
+
 }

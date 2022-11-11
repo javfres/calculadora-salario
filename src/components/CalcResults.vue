@@ -5,7 +5,7 @@
             <Bar :items="barItems"></Bar>
             <SalaryTable :table="tables.empleado"></SalaryTable>
             <SalaryTable :table="tables.empresa"></SalaryTable>
-            <Description :description="calculator.description"></Description>
+            <DescriptionTable :description="calculator.description"></DescriptionTable>
         </template>
 
     </div>
@@ -18,7 +18,7 @@ import IRPF from '../irpf/irpf';
 import {ConfigContribuyente, configs, getSituacionFromID} from '../irpf/config/config';
 import Bar, {BarItem} from './Bar.vue';
 import SalaryTable, { Table2 } from './Table.vue';
-import Description from './Description.vue';
+import DescriptionTable from './DescriptionTable.vue';
 import { computed, reactive, ref, Ref, toRef, watch } from 'vue';
 
 

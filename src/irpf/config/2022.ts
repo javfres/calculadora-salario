@@ -77,17 +77,17 @@ export default class Config2022 implements Config {
         if(config.edad){
             if(config.edad >= 75) {
                 minimo = 6950;
-                description.add().text("Al tener más de 75 años, corresponde una reducción de").euros(minimo);
+                description.line().text("Al tener más de 75 años, corresponde una reducción de").euros(minimo);
             } else if(config.edad >= 65) {
                 minimo = 6700;
-                description.add().text("Al tener más de 75 años, corresponde una reducción de").euros(minimo);
+                description.line().text("Al tener más de 75 años, corresponde una reducción de").euros(minimo);
             } else {
                 minimo = 5550;
-                description.add().text(`Al tener ${ config.edad } años, corresponde el mínimo personal, una reducción de`).euros(minimo);
+                description.line().text(`Al tener ${ config.edad } años, corresponde el mínimo personal, una reducción de`).euros(minimo);
             }
         } else {
             minimo = 5550;
-            description.add().text(`El mínimo personale es una reducción de`).euros(minimo);
+            description.line().text(`El mínimo personale es una reducción de`).euros(minimo);
         }
 
         const reducciónHijoN = (num: number) =>{
@@ -100,7 +100,7 @@ export default class Config2022 implements Config {
         }
 
         if (config.situacion_id === 'matri-conj') {
-            description.add()
+            description.line()
                 .text("Al realizar la declaración conjunta, hay una reducción addicional de:")
                 .euros(matrimonio);
             minimo += matrimonio;
@@ -113,7 +113,7 @@ export default class Config2022 implements Config {
 
         for(let i=1; i<=config.hijos; i++){
             const reducción = reducciónHijoN(i);
-            description.add()
+            description.line()
                 .text(`Por el hijo #${i} corresponde una reducción de`)
                 .euros(reducción);
             reducciónHijos += reducción;
@@ -124,7 +124,7 @@ export default class Config2022 implements Config {
             case "matri-ind":
                 minimo += reducciónHijos/2;
 
-                description.add()
+                description.line()
                     .text("La reducción total por hijos es de")
                     .euros(reducciónHijos)
                     .dot()
@@ -138,7 +138,7 @@ export default class Config2022 implements Config {
             case "matri-conj":
                 minimo += reducciónHijos;
 
-                description.add()
+                description.line()
                     .text("La reducción total por hijos es de")
                     .euros(reducciónHijos)
                     .dot()
@@ -151,7 +151,7 @@ export default class Config2022 implements Config {
                 minimo += reducciónHijos;
                 minimo += monoparental;
 
-                description.add()
+                description.line()
                     .text("La reducción total por hijos es de")
                     .euros(reducciónHijos)
                     .dot()
@@ -163,10 +163,7 @@ export default class Config2022 implements Config {
                 break
         }
 
-
-
         return minimo;
-
     }
 
     tramos(): Tramo[] {
