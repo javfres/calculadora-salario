@@ -1,56 +1,86 @@
 import { Dinero } from "dinero.js";
 
-export class Line {
+type Options = {
+    quotes?: boolean,
+    parenthesis?: boolean,
+}
 
-    id: number;
+type Item = {
+    type: 'text' | 'euros' | 'percentage' | 'symbol',
+    text?: string,
+    value?: number,
+    options: Options,
+}
 
-    items: {
-        type: 'text' | 'euros' | 'percentage' | 'symbol',
-        text?: string,
-        value?: number,
-    }[] = [];
+
+interface LineOrGroup {
+    isLine(): boolean;
+    isGroup(): boolean;
+}
+
+export class Line implements LineOrGroup {
+
+    id: string;
+
+    items: Item[] = [];
 
     constructor(id: number){
-        this.id = id;
+        this.id = "line-" + id;
+    }
+
+    private push(item: Partial<Item>): Line {
+
+        const item2: Item = {
+            ...{
+                type: "text",
+                options: {},
+            },
+            ...item
+        };
+
+        this.items.push(item2)
+        return this;
     }
     
-    text(text:string, options:{quotes?: boolean} = {}): Line {
+    text(text:string, options:Options = {}): Line {
 
-        if(options.quotes) {
-            text = `"${text}"`;
-        }
-
-        this.items.push({
+        this.push({
             type: "text",
             text,
+            options,
         });
         return this;
     }
 
-    euros(value:number|Dinero.Dinero): Line {
-        this.items.push({
+    euros(value:number|Dinero.Dinero, options:Options = {}): Line {
+        this.push({
             type: "euros",
             value: typeof value === 'number' ? value : value.toRoundedUnit(2),
+            options,
         });
         return this;
     }
     
-    percentage(value:number): Line {
-        this.items.push({
+    percentage(value:number, options:Options = {}): Line {
+        this.push({
             type: "percentage",
             value,
+            options,
         });
+        return this;
+    }
+
+    symbol(symbol: string): Line{
+        this.push({type: 'symbol', text: symbol});
         return this;
     }
 
     dot(): Line {
-        this.items.push({type: 'symbol', text: '.'});
-        return this;
+        return this.symbol(".");
     }
 
     coma(): Line {
-        this.items.push({type: 'symbol', text: ','});
-        return this;
+        return this.symbol(",");
     }
 
     toHtml(): string {
@@ -61,13 +91,13 @@ export class Line {
 
         let html = "";
 
-        for(const {type, text, value} of this.items) {
+        for(const {type, text, value, options} of this.items) {
 
             if (html != "" && type != 'symbol'){
                 html += " ";
             }
 
-            html += (()=>{
+            let res = (()=>{
                 switch (type) {
                     case 'text': return text;
                     case 'euros': return `<span class="euros">${value?.toFixed(2)}€</span>`
@@ -76,19 +106,82 @@ export class Line {
                     default: return "";
                 }
             })();
+
+            if(options.parenthesis){
+                res = `(${res})`;
+            } else if (options.quotes){
+                res = `"${res}"`;
+            }
+
+            html += res;
         }
 
         return html;
     }
+
+    isLine(){
+        return true;
+    }
+
+    isGroup(){
+        return false;
+    }
+
 }
+
+export class Group implements LineOrGroup {
+
+    static id = 0;
+
+    id: string;
+    items: (Line|Group)[] = [];
+    parent?: Group;
+
+    constructor(parent?: Group){
+        this.id = "group-" + (++Group.id);
+        this.parent = parent;
+    }
+
+    line(): Line {
+        const l = new Line(this.items.length);
+        this.items.push(l);
+        return l;
+    }
+
+    group(): Group {
+        const g = new Group(this);
+        this.items.push(g);
+        return g;
+    }
+
+    isLine(){
+        return false;
+    }
+
+    isGroup(){
+        return true;
+    }
+}
+
 
 export class Description {
 
-    lines: Line[] = [];
+    readonly root = new Group();
+    private current = this.root;
 
-    add(): Line {
-        const it = new Line(this.lines.length);
-        this.lines.push(it);
-        return it;
+
+    startGroup(): Description {
+        this.current = this.current.group();
+        return this;
     }
+
+    endGroup(): Description {
+        this.current = this.current.parent ?? this.root;
+        return this;
+    }
+
+    line(): Line {
+        return this.current.line()
+    }
+
 }

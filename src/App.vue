@@ -2,16 +2,10 @@
   <Calculator/>
 </template>
 
-<script lang="ts">
-import { Options, Vue } from 'vue-class-component';
+<script setup lang="ts">
+
 import Calculator from './components/Calculator.vue';
 
-@Options({
-  components: {
-    Calculator,
-  },
-})
-export default class App extends Vue {}
 </script>
 
 <style>
