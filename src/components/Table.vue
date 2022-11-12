@@ -10,7 +10,7 @@
         <template v-for="row of table.rows" :key="row.id">
             <div class="entry">{{ row.name }}</div>
             <div class="value" :class="{unique: table.has_b&&!row.has_b}"> {{ row.a }}</div>
-            <div v-if="row.has_b" class="value valueb"> {{ row.b  }}</div>
+            <div v-if="row.has_b" class="value valueb">{{ row.b }}</div>
         </template>
 
     </div>
@@ -53,7 +53,7 @@ class Row {
                 v = v.toFixed(this.decimals)
                 switch(this.type) {
                     case "eur":
-                        v += ' €';
+                        v += '€';
                         break;
                     case "per":
                         v += '%';
