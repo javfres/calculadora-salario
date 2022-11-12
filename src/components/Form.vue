@@ -119,7 +119,7 @@ watch(() => state.hijos, onUpdateInput)
     margin-bottom: 30px;
 
     //background-color: rgb(232, 232, 232);
-    padding: 10px;
+    padding: 2px;
 
     .thelabel {
         grid-column-start: 1;
@@ -134,13 +134,15 @@ watch(() => state.hijos, onUpdateInput)
         grid-column-start: 2;
         grid-column-end: 3;
         display: flex;
-        gap: 10px;
+        gap: 8px;
 
         input, select {
             padding: 10px 10px;
             margin: 4px 0;
             box-sizing: border-box;
             flex: 1;
+            //flex-basis: 0;
+            width: 0;
         }
     }
 }

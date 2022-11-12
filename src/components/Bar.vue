@@ -5,7 +5,7 @@
 
             <div class="content">
                 <div class="name">{{b.name}}</div>
-                <div class="amount">{{b.amount}} €</div>
+                <div class="amount">{{b.amount}}€</div>
             </div>
 
            <Bar v-if="b.subitems" :items="b.subitems" :level="level+1"></Bar>
