@@ -19,6 +19,8 @@
             </a>
         </p>
 
+        <CuantoAlMes @al-mes="alMes"></CuantoAlMes>
+
         <Form @newConfig="newConfig"></Form>
         <CalcResults v-if="config" :config="config"></CalcResults>
 
@@ -28,9 +30,12 @@
 <script setup lang="ts">
 
 import Form from './Form.vue';
-import {ConfigContribuyente} from '../irpf/config/config';
+import {ConfigContribuyente, configs} from '../irpf/config/config';
 import CalcResults from './CalcResults.vue';
+import CuantoAlMes from './CuantoAlMes.vue'
 import { Ref, ref } from 'vue';
+import { PID } from '@/irpf/pid';
+import IRPF from '../irpf/irpf';
 
 const config: Ref<ConfigContribuyente|undefined> = ref()
 
@@ -38,5 +43,30 @@ function newConfig(c: ConfigContribuyente){
     console.log("New config has been generated", c);
     config.value = c;
 }
+
+
+function alMes(expected: number) {
+    
+
+    console.log("expected", expected);
+    console.log(config.value);
+
+
+    const pid = new PID((salarioA) => {
+
+        const calc = new IRPF(configs[0]);
+        const inp = {...config.value!, salarioA}
+        calc.calcular(inp)
+
+        return calc.a.neto_mes;
+
+    }, {start: expected*12});
+
+    const salarioA = pid.run(expected);
+
+    config.value = { ...config.value!,  salarioA} ;
+
+}
+
 
 </script>
