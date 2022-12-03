@@ -15,10 +15,7 @@ interface Props {
     description: Description
 }
 
-const props = defineProps<Props>();
-
-console.log(props.description)
-
+defineProps<Props>();
 
 </script>
 
