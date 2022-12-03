@@ -12,8 +12,8 @@
 
         <div class="thelabel">Bruto anual</div>
         <div class="theinput">
-            <input type="number" v-model="state.salary_a" step="1000" min="0">
-            <input type="number" v-model="state.salary_b" step="1000" min="0" v-if="state.situacion_id === 'matri-conj'">
+            <input type="number" v-model="state.salarioA" step="1000" min="0">
+            <input type="number" v-model="state.salarioB" step="1000" min="0" v-if="state.situacion_id === 'matri-conj'">
         </div>  
         
         <div class="thelabel">Edad</div>
@@ -35,25 +35,43 @@
 <script setup lang="ts">
 
 import { computed, reactive } from '@vue/reactivity';
-import { onMounted, watch } from 'vue';
+import { onMounted, watch, toRef } from 'vue';
 import {ConfigContribuyente, getSituacionFromID, situaciones, situacion_id_t} from '../irpf/config/config';
+
+export interface Props {
+    start: ConfigContribuyente;
+}
+
+const props = defineProps<Props>();
+
 
 
 interface State {
     situacion_id: situacion_id_t,
-    salary_a: number,
-    salary_b: number,
+    salarioA: number,
+    salarioB: number,
     edad: number,
     hijos: number,
 }
 
 const state = reactive<State>({
-    situacion_id: situaciones[0].id,
-    salary_a: 20000,
-    salary_b: 0,
-    edad: 30,
-    hijos: 0,
+    situacion_id: props.start.situacion_id,
+    salarioA: props.start.salarioA,
+    salarioB: props.start.salarioB,
+    edad: props.start.edad || 30,
+    hijos: props.start.hijos || 0,
 })
+
+
+watch(toRef(props, "start"), start => {
+    state.situacion_id = start.situacion_id;
+    state.salarioA = start.salarioA;
+    state.salarioB = start.salarioB;
+    state.edad = start.edad || 30;
+    state.hijos = start.hijos || 0;
+});
+
+
 
 const situacion = computed(() => getSituacionFromID(state.situacion_id))
 
@@ -67,8 +85,6 @@ onMounted(() => {
 
 function onUpdateSituacion(){
 
-    console.log("update situación")
-
     if(!situacion.value.has_hijos) {
         state.hijos = 0;
     } else if (situacion.value.min_hijos > 0) {
@@ -76,7 +92,7 @@ function onUpdateSituacion(){
     }
 
     if(!situacion.value.has_b) {
-        state.salary_b = 0;
+        state.salarioB = 0;
     }
 
     onUpdateInput();
@@ -84,27 +100,22 @@ function onUpdateSituacion(){
 
 function onUpdateInput(){
 
-    console.log("update input")
-
     const config: ConfigContribuyente = {
-        salarioA: state.salary_a,
-        salarioB: state.salary_b,
+        salarioA: state.salarioA,
+        salarioB: state.salarioB,
         situacion_id: state.situacion_id,
         edad: state.edad,
         hijos: state.hijos,
     };
 
-    console.log("emit newConfig", config);
     emit('newConfig', config)
 }
 
 watch(() => state.situacion_id, onUpdateSituacion)
-watch(() => state.salary_a, onUpdateInput)
-watch(() => state.salary_b, onUpdateInput)
+watch(() => state.salarioA, onUpdateInput)
+watch(() => state.salarioB, onUpdateInput)
 watch(() => state.edad, onUpdateInput)
 watch(() => state.hijos, onUpdateInput)
-
-
 
 </script>
 

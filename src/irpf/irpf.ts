@@ -225,7 +225,8 @@ export default class CalculadoraSalario {
             .euros(d_neto_total);
 
 
-        this.irpf_porcentaje = 100 * d_irpf.toUnit() / d_bruto_total.subtract(d_seguridad_social_ab).toUnit()
+        // El porcentaje de irpf es sobre el bruto 
+        this.irpf_porcentaje = 100 * d_irpf.toUnit() / d_bruto_total.toUnit()
 
         this.description.line()
             .text("Lo que corresponde a un porcentaje de IRPF en nómina de")
@@ -251,12 +252,8 @@ export default class CalculadoraSalario {
 
         } else {
 
-
             const d_neto_a = (d_bruto_a.subtract(d_seguridad_social_a)).multiply((1-this.irpf_porcentaje/100));
             const d_neto_b = d_neto_total.subtract(d_neto_a);
-
-            console.log(d_bruto_a.toRoundedUnit(2), (1-this.irpf_porcentaje/100), d_neto_a.toRoundedUnit(2));
-
 
             this.a.neto = d_neto_a.toRoundedUnit(2);
             this.b.neto = d_neto_b.toRoundedUnit(2);
@@ -275,7 +272,6 @@ export default class CalculadoraSalario {
             .euros(this.a.neto_mes)
             .text("y")
             .euros(this.b.neto_mes)
-
         }
 
         this.description.endGroup();

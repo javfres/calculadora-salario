@@ -54,18 +54,11 @@ export class PID {
             const rateError = error - lastError;
             lastError = error;
 
-
-            console.log({i, current, output, error, acumError});
             if(Math.abs(error) < 0.01) break;
 
             current += error * this.Kp + acumError * this.Ki + rateError * this.Kd;
         }
 
-
         return current;
-
     }
-
-
-
 }
