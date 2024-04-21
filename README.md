@@ -2,7 +2,7 @@
 
 [Link a la Calculadora](https://javfres.github.io/calculadora-salario)
 
-Calculadora de salario neto para 2022.
+Calculadora de salario neto para 2022-2023. Usando los datos de Castilla y León.
 Probando otras calculadoras obtenía diferentes valores para las mismas entradas.
 He creado mi propia calculadora para entender el calculo de la contribución
 a la Seguridad Social y el impuesto del IRPF.
@@ -22,6 +22,12 @@ Otras calculadoras:
 * https://www.lavanguardia.com/etc/calculadoras/calcula-tu-sueldo
 * https://santandersmartbank.es/calculadora-sueldo-neto/#resultados_calculadora_nomina
 * https://cincodias.elpais.com/herramientas/calculadora-sueldo-neto/#tabla_resultados
+
+## Changelog
+
+* Abr 2024: actualización de la calculadora para 2023
+    * Los datos los iguales que en 2022 excepto los cambios en las bases de cotización. Son iguales: tramos, tipos y los mínimo de CyL.
+* Nov 2022: primera versión
 
 
 ## Project setup

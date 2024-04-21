@@ -1,6 +1,6 @@
 <template>
     <div class="descriptiontable">
-        <DescriptionGroup :group="description.root"></DescriptionGroup>
+        <DescriptionGroup v-if="descriptions.length>0" :group="descriptions[0].root"></DescriptionGroup>
     </div>
 </template>
   
@@ -12,7 +12,7 @@ import DescriptionGroup from './DescriptionGroup.vue';
 import { Description } from '@/irpf/description';
 
 interface Props {
-    description: Description
+    descriptions: Description[];
 }
 
 defineProps<Props>();

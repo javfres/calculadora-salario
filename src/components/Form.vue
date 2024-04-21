@@ -1,6 +1,15 @@
 <template>
     <div class="theform">
     
+        <div class="thelabel">Año</div>
+        <div class="theinput">
+            <select v-model="state.year">
+                <option v-for="y of years" :key="y" :value="y">
+                    {{ y }}
+                </option>
+            </select>
+        </div> 
+
         <div class="thelabel">Situación</div>
         <div class="theinput">
             <select v-model="state.situacion_id">
@@ -28,6 +37,16 @@
             </div> 
         </template>
 
+        <!-- Oculto porque sólo se usa la base máxima y esa es común a todos los grupos -->
+        <div class="thelabel">Grupo de cotización</div>
+        <div class="theinput">
+            <select v-model="state.grupo_cotizacion">
+                <option v-for="g of grupo_cotizacion_names" :key="g.grupo" :value="g.grupo">
+                    Grupo {{ g.grupo }} - {{ g.nombre }}
+                </option>
+            </select>
+        </div> 
+
     </div>
 </template>
 
@@ -36,7 +55,7 @@
 
 import { computed, reactive } from '@vue/reactivity';
 import { onMounted, watch, toRef } from 'vue';
-import {ConfigContribuyente, getSituacionFromID, situaciones, situacion_id_t} from '../irpf/config/config';
+import {ConfigContribuyente, getSituacionFromID, situaciones, situacion_id_t, years, grupo_cotizacion_names} from '../irpf/config/config';
 
 export interface Props {
     start: ConfigContribuyente;
@@ -47,6 +66,8 @@ const props = defineProps<Props>();
 
 
 interface State {
+    year: number,
+    grupo_cotizacion: number,
     situacion_id: situacion_id_t,
     salarioA: number,
     salarioB: number,
@@ -55,6 +76,8 @@ interface State {
 }
 
 const state = reactive<State>({
+    year: props.start.year || years[0],
+    grupo_cotizacion: props.start.grupo_cotizacion || 1,
     situacion_id: props.start.situacion_id,
     salarioA: props.start.salarioA,
     salarioB: props.start.salarioB,
@@ -101,6 +124,8 @@ function onUpdateSituacion(){
 function onUpdateInput(){
 
     const config: ConfigContribuyente = {
+        year: state.year,
+        grupo_cotizacion: state.grupo_cotizacion,
         salarioA: state.salarioA,
         salarioB: state.salarioB,
         situacion_id: state.situacion_id,
@@ -116,6 +141,8 @@ watch(() => state.salarioA, onUpdateInput)
 watch(() => state.salarioB, onUpdateInput)
 watch(() => state.edad, onUpdateInput)
 watch(() => state.hijos, onUpdateInput)
+watch(() => state.grupo_cotizacion, onUpdateInput)
+watch(() => state.year, onUpdateInput)
 
 </script>
 

@@ -4,46 +4,50 @@ import { Config, ConfigContribuyente, Tipo, Tramo } from "./base";
 const grupos_contizacion = [
     {
         grupo: 1,
-        base_minima: 1629.3,
-        base_maxima: 4139.4,
+        base_minima: 1759.5,
+        base_maxima: 4495.50
     },
     {
         grupo: 2,
-        base_minima: 1351.2,
-        base_maxima: 4139.4,
+        base_minima: 1459.2,
+        base_maxima: 4495.50
     },
     {
         grupo: 3,
-        base_minima: 1175.4,
-        base_maxima: 4139.4,
+        base_minima: 1269.3,
+        base_maxima: 4495.50
     },
     {
         grupo: 4,
-        base_minima: 1166.7,
-        base_maxima: 4139.4,
+        base_minima: 1260,
+        base_maxima: 4495.50
     },
     {
         grupo: 5,
-        base_minima: 1166.7,
-        base_maxima: 4139.4,
+        base_minima: 1260,
+        base_maxima: 4495.50
     },
     {
         grupo: 6,
-        base_minima: 1166.7,
-        base_maxima: 4139.4,
+        base_minima: 1260,
+        base_maxima: 4495.50
     },
     {
         grupo: 7,
-        base_minima: 1166.7,
-        base_maxima: 4139.4,
+        base_minima: 1260,
+        base_maxima: 4495.50
     },
 ];
 
 
-export default class Config2022 implements Config {
+export default class Config2023 implements Config {
 
     year(): number {
-        return 2022;
+        return 2023;
+    }
+
+    salario_minimo_interprofesional(): number {
+        return 15876;
     }
 
     //
@@ -101,6 +105,7 @@ export default class Config2022 implements Config {
 
     describe_minimo_contribuyente(config: ConfigContribuyente, description: Description): number {
         
+        // https://sede.agenciatributaria.gob.es/Sede/irpf/tengo-que-presentar-declaracion/declaracion-individual-conjunta/caracteristicas-tributacion-conjunta.html#:~:text=2.150%20%E2%82%AC%20anuales%20para%20unidad,con%20%C3%A9l%20o%20con%20ella.
         const matrimonio = 3400;
         const monoparental = 2150;
 

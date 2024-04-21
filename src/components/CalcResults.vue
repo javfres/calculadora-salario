@@ -5,7 +5,7 @@
             <Bar :items="barItems"></Bar>
             <SalaryTable :table="tables.empleado"></SalaryTable>
             <SalaryTable :table="tables.empresa"></SalaryTable>
-            <DescriptionTable :description="calculator.description"></DescriptionTable>
+            <DescriptionTable :descriptions="descriptions"></DescriptionTable>
         </template>
 
     </div>
@@ -20,6 +20,7 @@ import Bar, {BarItem} from './Bar.vue';
 import SalaryTable, { Table2 } from './Table.vue';
 import DescriptionTable from './DescriptionTable.vue';
 import { computed, reactive, ref, Ref, toRef, watch } from 'vue';
+import { Description } from '@/irpf/description';
 
 
 export interface Props {
@@ -28,7 +29,7 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-const calculator = new IRPF(configs[0])
+const descriptions: Ref<Description[]> = ref([]);
 
 const barItems: Ref<BarItem[]> = ref([]);
 
@@ -46,6 +47,8 @@ watch(toRef(props, "config"), onUpdateConfig);
 onUpdateConfig(props.config);
 
 function onUpdateConfig(config: ConfigContribuyente){
+
+    const calculator = new IRPF(configs[config.year])
 
     calculator.calcular(config)
 
@@ -117,6 +120,7 @@ function onUpdateConfig(config: ConfigContribuyente){
 
     }
 
+    descriptions.value = [calculator.description];
 
 }
 

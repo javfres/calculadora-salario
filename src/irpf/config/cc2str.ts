@@ -1,6 +1,8 @@
 
 import { ConfigContribuyente } from "./base";
-import { situacion_id_t } from "./config";
+import { situacion_id_t, years } from "./config";
+
+const lastYear = years[0];
 
 function salary2str(s: number): string {
 
@@ -39,6 +41,14 @@ export function cc2str(cc: ConfigContribuyente): string {
         res += "h" + cc.hijos;
     }
 
+    if(cc.year !== lastYear){
+        res += "y" + cc.year;
+    }
+
+    if(cc.grupo_cotizacion !== 1){
+        res += "g" + cc.grupo_cotizacion;
+    }
+
     return res;
 
 }
@@ -60,7 +70,7 @@ function str2salary(s?: string): number {
 
 export function str2cc(q: string): ConfigContribuyente|null {
 
-    const res = /([scim])([0-9]+k?)(?:b([0-9]+k?))?(?:e([0-9]+))?(?:h([0-9]+))?/.exec(q);
+    const res = /([scim])([0-9]+k?)(?:b([0-9]+k?))?(?:e([0-9]+))?(?:h([0-9]+))?(?:y([0-9]+))?(?:g([0-9]+))?/.exec(q);
     if(!res) return null;
 
     const situacion_id: situacion_id_t = ((x:string)=>{
@@ -81,7 +91,13 @@ export function str2cc(q: string): ConfigContribuyente|null {
 
     const hijos = +(res[5]||0);
 
+    const year = +(res[6]||lastYear);
+
+    const grupo_cotizacion = +(res[7]||1);
+
     return {
+        year,
+        grupo_cotizacion,
         situacion_id,
         salarioA,
         salarioB,

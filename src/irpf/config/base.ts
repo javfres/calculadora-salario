@@ -17,12 +17,15 @@ export type Tramo = {
 }
 
 export type ConfigContribuyente = {
+    year: number;
+    grupo_cotizacion: number;
     salarioA: number;
     salarioB: number;
     situacion_id: situacion_id_t;
     edad?: number;
     hijos?: number;
 }
+
 
 export interface Config {
 
@@ -33,19 +36,16 @@ export interface Config {
     // Seguridad Social
     //
 
-    /** Define el grupo de cotización (modifica la base máxima) */
-    setGrupoCotization(grupo: number): void;
-
     /** 
      * Base mínima de cotización
      * https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537?changeLanguage=es
      */
-    base_minima(): number;
+    base_minima(grupo_cotizacion: number): number;
 
     /** 
      * Base máxima de cotización
      */
-    base_maxima(): number;
+    base_maxima(grupo_cotizacion: number): number;
 
     /**
      * Tipos de cotización con el porcentage del empleado y la empresa
