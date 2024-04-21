@@ -4,7 +4,7 @@
         <h1>Calculadora Salario Neto</h1>
 
         <p>
-            Calculadora salario neto para el año 2022.
+            Calculadora salario neto para el año 2023.
         </p>
 
         <p>
@@ -40,6 +40,8 @@ import { updateURL, getCCFromURL } from '@/irpf/config/cc2str';
 
 
 const start = ref<ConfigContribuyente>({
+    year: 2023,
+    grupo_cotizacion: 1,
     situacion_id: situaciones[0].id,
     salarioA: 20000,
     salarioB: 0,
@@ -63,7 +65,7 @@ function alMes(expected: number) {
     
     const pid = new PID((salarioA) => {
 
-        const calc = new IRPF(configs[0]);
+        const calc = new IRPF(configs[config.value!.year]);
         const inp = {...config.value!, salarioA}
         calc.calcular(inp)
 

@@ -49,6 +49,9 @@ export default class CalculadoraSalario {
         // Create a new description object
         this.description = new Description();
 
+        this.description.line().text("Calculando salario para el año").text("" + this.config.year(), {quotes: true});
+
+
         //
         // Bruto
         //
@@ -95,18 +98,23 @@ export default class CalculadoraSalario {
             const bruto = isA ? bruto_a : bruto_b;
 
             // Base sobre la que se aplican los porcentajes
-            const d_base_seguridad_social = D(
-                Math.min(this.config.base_maxima() * 12, bruto)
-            );
+            const b_min = this.config.base_minima(configContribuyente.grupo_cotizacion) * 12;
+            const b_max = this.config.base_maxima(configContribuyente.grupo_cotizacion) * 12;
+
+            const d_base_seguridad_social = D(Math.max(b_min,Math.min(b_max, bruto)));
 
             const line = this.description.line()
-                .text("La base sobre la que se aplica el caculo de la cotización")
+                .text("La base sobre la que se aplica el calculo de la cotización")
                 .text("de la Seguridad Social es")
                 .euros(d_base_seguridad_social)
+                .text("para el grupo de cotización")
+                .text("" + configContribuyente.grupo_cotizacion, {quotes: true})
                 .dot();
 
-            if(d_bruto_total.greaterThan(d_base_seguridad_social)){
-                line.text("Esta es la base máxima de cotización para el grupo 1");
+            if (d_bruto_total.lessThan(D(b_min))){
+                line.text("El salario no llega a la base mínima de cotización!!!!");
+            }  else if(d_bruto_total.greaterThan(d_base_seguridad_social)){
+                line.text("Esta es la base máxima de cotización para el grupo");
             }
 
             let d_seguridad_social = Dinero();
