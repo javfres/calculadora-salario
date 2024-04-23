@@ -17,6 +17,7 @@
 </template>
   
 <script lang="ts">
+import { formatNumberEsp } from '@/utils';
 
 class Row {
     table: Table2;
@@ -100,7 +101,6 @@ export class Table2 {
 </script>
   
 <script setup lang="ts">
-import { formatNumberEsp } from '@/utils';
 
 
 interface Props {

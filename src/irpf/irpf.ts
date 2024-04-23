@@ -20,6 +20,7 @@ export class Resultado {
 export default class CalculadoraSalario {
 
     config: Config;
+    configContribuyente: ConfigContribuyente;
     
     // A y B para declaración conjunta
     a = new Resultado();
@@ -35,11 +36,14 @@ export default class CalculadoraSalario {
 
     description: Description = new Description();
 
-    constructor(config: Config){
+    constructor(config: Config, configContribuyente: ConfigContribuyente){
         this.config = config;
+        this.configContribuyente = configContribuyente;
     }
 
-    calcular(configContribuyente: ConfigContribuyente) {
+    calcular() {
+
+        const configContribuyente = this.configContribuyente;
 
         const bruto_a = configContribuyente.salarioA;
         const bruto_b = configContribuyente.salarioB;

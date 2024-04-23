@@ -48,7 +48,7 @@ export interface Config {
     base_maxima(grupo_cotizacion: number): number;
 
     /**
-     * Tipos de cotización con el porcentage del empleado y la empresa
+     * Tipos de cotización con el porcentaje del empleado y la empresa
      */
     tipos(): Tipo[];
 
