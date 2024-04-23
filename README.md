@@ -26,11 +26,13 @@ Otras calculadoras:
 ## Notas
 
 * ¿Base de cotización puede ser mayor que salario?: https://foros.elasesorlaboral.com/threads/base-cotizacion-mayor-que-salario.34542/
+* El cálculo de la declaración conjunta puede no ser correcto, ¿Se suman ambas bases para hacer el cálculo de las cuotas integras de IRPF?
 
-## Changelog
+## Changelog
 
 * Abr 2024: actualización de la calculadora para 2023
     * Los datos los iguales que en 2022 excepto los cambios en las bases de cotización. Son iguales: tramos, tipos y los mínimo de CyL.
+    * Usando cálculo real de las cuotas integras y líquidas. En vez de usar los tramos de IRPF pre-calculados.
 * Nov 2022: primera versión
 
 

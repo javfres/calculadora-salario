@@ -12,8 +12,9 @@ export type Tipo = {
 
 // Tramo cotización
 export type Tramo = {
-    hasta: number;
-    porcentaje: number;
+    base_liquidable_hasta: number;
+    cuota_integra: number;
+    porcentaje_resto: number;
 }
 
 export type ConfigContribuyente = {
@@ -72,5 +73,6 @@ export interface Config {
     /**
      * Tramos del IRPF
      */
-    tramos(): Tramo[];
+    escala_gravamen_estatal(): Tramo[];
+    escala_gravamen_autonomico(ccaa: string): Tramo[];
 }

@@ -2,6 +2,7 @@
 import Dinero from 'dinero.js'
 import { Config, ConfigContribuyente, situaciones } from './config/config';
 import { Description } from './description';
+import { Tramo } from './config/base';
 
 function D(amount: number): Dinero.Dinero {
     return Dinero({amount: Math.floor(amount*100), precision: 2})
@@ -100,6 +101,7 @@ export default class CalculadoraSalario {
             if(!isA && !has_b) return;
             
             const bruto = isA ? bruto_a : bruto_b;
+            const d_bruto = D(bruto);
 
             // Base sobre la que se aplican los porcentajes
             const b_min = this.config.base_minima(configContribuyente.grupo_cotizacion) * 12;
@@ -115,9 +117,9 @@ export default class CalculadoraSalario {
                 .text("" + configContribuyente.grupo_cotizacion, {quotes: true})
                 .dot();
 
-            if (d_bruto_total.lessThan(D(b_min))){
+            if (d_bruto.lessThan(D(b_min))){
                 line.text("El salario no llega a la base mínima de cotización!!!!");
-            }  else if(d_bruto_total.greaterThan(d_base_seguridad_social)){
+            }  else if(d_bruto.greaterThan(d_base_seguridad_social)){
                 line.text("Esta es la base máxima de cotización para el grupo");
             }
 
@@ -196,12 +198,15 @@ export default class CalculadoraSalario {
 
         // https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2023/c15-calculo-impuesto-determinacion-cuotas-integras/ejemplo-practico-calculo-cuotas-integras-autonomica.html
 
-        // Quitar el mínimo personal
-        const reducción = this.config.describe_minimo_contribuyente(configContribuyente, this.description);
-        const d_redución_irpf = D(reducción)
         let d_base_imponible = d_bruto_total;
         d_base_imponible = d_base_imponible.subtract(d_seguridad_social_ab)
-        d_base_imponible = d_base_imponible.subtract(d_redución_irpf)
+        if (d_base_imponible.isNegative()){
+            d_base_imponible = D(0);
+        }
+        
+        // Otros gastos deducibles
+        const otros_gastos = D(2000);
+        d_base_imponible = d_base_imponible.subtract(otros_gastos);
         if (d_base_imponible.isNegative()){
             d_base_imponible = D(0);
         }
@@ -214,18 +219,18 @@ export default class CalculadoraSalario {
             .euros(d_bruto_total)
             .text("menos la contribución a la seguridad social")
             .euros(d_seguridad_social_ab)
-            .text("y la reducción correspondiente según la situación familiar")
-            .euros(d_redución_irpf, {parenthesis: true})
+            .text(`y menos "otros gastos deducibles"`)
+            .euros(otros_gastos);
 
         this.description.line()
-            .text("Ahora se calcula los tramos del IRPF").symbol(":");
+            .text("Ahora se calcula el IRPF").symbol(":");
         this.description.startGroup()
 
-        const d_irpf = this.calcularTramos(d_base_imponible);
+        const d_irpf = this.calcularCuotasIntegras(d_base_imponible);
         this.irpf = d_irpf.toRoundedUnit(2);
 
         this.description.line()
-            .text("La retención total del IRPF es de")
+            .text("La cuota líquida total del IRPF es de")
             .euros(d_irpf);
         this.description.endGroup()
 
@@ -326,40 +331,147 @@ export default class CalculadoraSalario {
             .text("en impuestos");
     }
 
-    calcularTramos(cantidad: Dinero.Dinero): Dinero.Dinero {
 
-        let retencionTotal = Dinero();
+    seleccionaEscala(cantidad: Dinero.Dinero, tramos: Tramo[]): Tramo {
+        // Empezando por el último tramo, comprobar si la cantidad está en ese tramo
+        for(const tramo of tramos.reverse()){
+            if(cantidad.greaterThanOrEqual(D(tramo.base_liquidable_hasta))){
+                return tramo;
+            }
+        }
+        throw new Error("No se ha encontrado tramo para la cantidad " + cantidad.toUnit());
+    }
 
-        const tramos = this.config.tramos();
-    
-        for(const [i, tramo] of tramos.entries()) {
-            const previo = i > 0 ? tramos[i-1].hasta : 0;
-    
-            const enTramo = Math.min(
-                cantidad.toUnit() - previo,
-                tramo.hasta-previo
-            )
-            if (enTramo <= 0) break;
-            
-            const retencion = D(enTramo * (tramo.porcentaje / 100));
-            retencionTotal = retencionTotal.add(retencion)
+
+    calcularCuotasIntegras(cantidad: Dinero.Dinero): Dinero.Dinero {
+
+        const mpf = D(this.config.minimo_contribuyente(this.configContribuyente));
+
+        this.description.line().text("Calculando cuotas íntegras del IRPF")
+            .text("para la cantidad").euros(cantidad)
+            .text("y el mínimo personal y familiar").euros(mpf);
+
+        // Cuotas estatales y autonómicas para las bases liquidables y para el mínimo personal y familiar
+        let cuota_estatal, cuota_autonomica, cuota_mpf_estatal, cuota_mpf_autonomica;
+
+        {
+            // Aplicación de la escala de gravamen general (estatal)
+            const tramo = this.seleccionaEscala(cantidad, this.config.escala_gravamen_estatal());
+            const cuota_integra = D(tramo.cuota_integra);
+            const resto = cantidad.subtract(D(tramo.base_liquidable_hasta));
+            const cuota_resto = D(resto.toUnit() * (tramo.porcentaje_resto / 100));
+            const cuota_total = cuota_integra.add(cuota_resto);
 
             this.description.line()
-                .text("En el tramo desde")
-                .euros(previo)
-                .text("a")
-                .euros(tramo.hasta)
-                .text("hay")
-                .euros(enTramo)
-                .text("para el salario bruto indicado")
-                .dot()
-                .text("Se retiene un")
-                .percentage(tramo.porcentaje)
+                .text("C1: El tramo de la escala de gravamen general (estatal) es")
+                .euros(tramo.base_liquidable_hasta)
+                .text("cuya cuota íntegra es")
+                .euros(cuota_integra)
+                .text("el resto de la base liquidable es")
+                .euros(resto)
+                .text("y se aplica un porcentaje del")
+                .percentage(tramo.porcentaje_resto)
                 .text("que corresponde a")
-                .euros(retencion)
+                .euros(cuota_resto)
+                .dot()
+                .text("La cuota total es de")
+                .euros(cuota_total);
+
+            cuota_estatal = cuota_total;
         }
+
+        {
+            // Aplicación de la escala de gravamen general (estatal) al mínimo personal y familiar
+            const tramo = this.seleccionaEscala(mpf, this.config.escala_gravamen_estatal());
+            const cuota_integra = D(tramo.cuota_integra);
+            const resto = mpf.subtract(D(tramo.base_liquidable_hasta));
+            const cuota_resto = D(resto.toUnit() * (tramo.porcentaje_resto / 100));
+            const cuota_total = cuota_integra.add(cuota_resto);
+
+            this.description.line()
+                .text("C2: El tramo de la escala de gravamen general (estatal) para el mínimo personal y familiar es")
+                .euros(tramo.base_liquidable_hasta)
+                .text("cuya cuota íntegra es")
+                .euros(cuota_integra)
+                .text("el resto de la base liquidable es")
+                .euros(resto)
+                .text("y se aplica un porcentaje del")
+                .percentage(tramo.porcentaje_resto)
+                .text("que corresponde a")
+                .euros(cuota_resto)
+                .dot()
+                .text("La cuota total es de")
+                .euros(cuota_total);
+
+            cuota_mpf_estatal = cuota_total;
+        }
+
+        {
+            // Aplicación de la escala de gravamen autonómica
+            const tramo = this.seleccionaEscala(cantidad, this.config.escala_gravamen_autonomico("cyl"));
+            const cuota_integra = D(tramo.cuota_integra);
+            const resto = cantidad.subtract(D(tramo.base_liquidable_hasta));
+            const cuota_resto = D(resto.toUnit() * (tramo.porcentaje_resto / 100));
+            const cuota_total = cuota_integra.add(cuota_resto);
+
+            this.description.line()
+                .text("C3: El tramo de la escala de gravamen autonómica es")
+                .euros(tramo.base_liquidable_hasta)
+                .text("cuya cuota íntegra es")
+                .euros(cuota_integra)
+                .text("el resto de la base liquidable es")
+                .euros(resto)
+                .text("y se aplica un porcentaje del")
+                .percentage(tramo.porcentaje_resto)
+                .text("que corresponde a")
+                .euros(cuota_resto)
+                .dot()
+                .text("La cuota total es de")
+                .euros(cuota_total);
+
+            cuota_autonomica = cuota_total;
+        }
+
+        {
+            // Aplicación de la escala de gravamen autonómica al mínimo personal y familiar
+            const mpf = D(this.config.minimo_contribuyente(this.configContribuyente));
+            const tramo = this.seleccionaEscala(mpf, this.config.escala_gravamen_autonomico("cyl"));
+            const cuota_integra = D(tramo.cuota_integra);
+            const resto = mpf.subtract(D(tramo.base_liquidable_hasta));
+            const cuota_resto = D(resto.toUnit() * (tramo.porcentaje_resto / 100));
+            const cuota_total = cuota_integra.add(cuota_resto);
+
+            this.description.line()
+                .text("C4: El tramo de la escala de gravamen autonómica para el mínimo personal y familiar es")
+                .euros(tramo.base_liquidable_hasta)
+                .text("cuya cuota íntegra es")
+                .euros(cuota_integra)
+                .text("el resto de la base liquidable es")
+                .euros(resto)
+                .text("y se aplica un porcentaje del")
+                .percentage(tramo.porcentaje_resto)
+                .text("que corresponde a")
+                .euros(cuota_resto)
+                .dot()
+                .text("La cuota total es de")
+                .euros(cuota_total);
+
+            cuota_mpf_autonomica = cuota_total;
+        }
+
+        const cuota_liquida_estatal = cuota_estatal.subtract(cuota_mpf_estatal);
+        const cuota_liquida_autonomica = cuota_autonomica.subtract(cuota_mpf_autonomica);
+        const cuota_liquida = cuota_liquida_estatal.add(cuota_liquida_autonomica);
+
+        this.description.line()
+            .text("La cuota líquida estatal (C1-C3) es de")
+            .euros(cuota_liquida_estatal)
+            .text("y la cuota líquida autonómica (C2-C4) es de")
+            .euros(cuota_liquida_autonomica)
+            .dot();
+
+       return cuota_liquida;
     
-        return retencionTotal;
     }
 
 }
