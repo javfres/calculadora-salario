@@ -1,7 +1,7 @@
 import { Description } from "../description";
 import { Config, ConfigContribuyente, Tipo, Tramo } from "./base";
 
-const grupos_contizacion = [
+const grupos_cotizacion = [
     {
         grupo: 1,
         base_minima: 1629.3,
@@ -51,7 +51,7 @@ export default class Config2022 implements Config {
     //
 
     base_minima(grupo_cotizacion: number): number {
-       const g = grupos_contizacion.find(g => g.grupo === grupo_cotizacion)
+       const g = grupos_cotizacion.find(g => g.grupo === grupo_cotizacion)
         if (g) {
             return g.base_minima;
         }
@@ -59,7 +59,7 @@ export default class Config2022 implements Config {
     }
 
     base_maxima(grupo_cotizacion: number): number {
-        const g = grupos_contizacion.find(g => g.grupo === grupo_cotizacion)
+        const g = grupos_cotizacion.find(g => g.grupo === grupo_cotizacion)
         if (g) {
             return g.base_maxima;
         }
@@ -198,33 +198,32 @@ export default class Config2022 implements Config {
         return minimo;
     }
 
-    tramos(): Tramo[] {
+    escala_gravamen_estatal(): Tramo[] {
         return [
-            {
-                hasta: 12450,
-                porcentaje: 19,
-            },
-            {
-                hasta: 20200,
-                porcentaje: 24,
-            },
-            {
-                hasta: 35200,
-                porcentaje: 30,
-            },
-            {
-                hasta: 60000,
-                porcentaje: 37,
-            },
-            {
-                hasta: 300000,
-                porcentaje: 45,
-            },
-            {
-                hasta: Number.MAX_VALUE,
-                porcentaje: 47,
-            }
+            {base_liquidable_hasta: 0, cuota_integra: 0, porcentaje_resto: 9.50},
+            {base_liquidable_hasta: 12450, cuota_integra: 1182.75, porcentaje_resto: 12},
+            {base_liquidable_hasta: 20200, cuota_integra: 2112.75, porcentaje_resto: 15},
+            {base_liquidable_hasta: 35200, cuota_integra: 4362.75, porcentaje_resto: 18.50},
+            {base_liquidable_hasta: 60000, cuota_integra: 8950.75, porcentaje_resto: 22.50},
+            {base_liquidable_hasta: 300000, cuota_integra: 62950.75, porcentaje_resto: 24.50},
         ];
+    }
+
+    escala_gravamen_autonomico(ccaa: string): Tramo[] {
+        switch(ccaa){
+            case "cyl":
+
+                return [
+                    {base_liquidable_hasta: 0, cuota_integra: 0, porcentaje_resto: 9},
+                    {base_liquidable_hasta: 12450, cuota_integra: 1120.50, porcentaje_resto: 12},
+                    {base_liquidable_hasta: 20200, cuota_integra: 2050.50, porcentaje_resto: 14},
+                    {base_liquidable_hasta: 35200, cuota_integra: 4150.50, porcentaje_resto: 18.50},
+                    {base_liquidable_hasta: 53407.20, cuota_integra: 7518.83, porcentaje_resto: 21.50},
+                ];
+        
+            default:
+                throw new Error(`No hay datos para la comunidad autónoma ${ccaa}`);
+        }
     }
 
 

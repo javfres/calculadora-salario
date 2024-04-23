@@ -203,35 +203,51 @@ export default class Config2023 implements Config {
         return minimo;
     }
 
-    tramos(): Tramo[] {
+    escala_gravamen_estatal(): Tramo[] {
+        //Base liquidable hasta euros	Cuota íntegra euros	Resto base liquidable hasta euros	Tipo aplicable Porcentaje
+        //Escala aplicable con independencia de su lugar de residencia
+        //0,00	0,00	12.450,00	9,50
+        //12.450,00	1.182,75	7.750,00	12,00
+        //20.200,00	2.112,75	15.000,00	15,00
+        //35.200,00	4.362,75	24.800,00	18,50
+        //60.000,00	8.950,75	240.000	22,50
+        //300.000,00	62.950,75	En adelante	24,50
+
         return [
-            {
-                hasta: 12450,
-                porcentaje: 19,
-            },
-            {
-                hasta: 20200,
-                porcentaje: 24,
-            },
-            {
-                hasta: 35200,
-                porcentaje: 30,
-            },
-            {
-                hasta: 60000,
-                porcentaje: 37,
-            },
-            {
-                hasta: 300000,
-                porcentaje: 45,
-            },
-            {
-                hasta: Number.MAX_VALUE,
-                porcentaje: 47,
-            }
+            {base_liquidable_hasta: 0, cuota_integra: 0, porcentaje_resto: 9.50},
+            {base_liquidable_hasta: 12450, cuota_integra: 1182.75, porcentaje_resto: 12},
+            {base_liquidable_hasta: 20200, cuota_integra: 2112.75, porcentaje_resto: 15},
+            {base_liquidable_hasta: 35200, cuota_integra: 4362.75, porcentaje_resto: 18.50},
+            {base_liquidable_hasta: 60000, cuota_integra: 8950.75, porcentaje_resto: 22.50},
+            {base_liquidable_hasta: 300000, cuota_integra: 62950.75, porcentaje_resto: 24.50},
         ];
     }
 
+    escala_gravamen_autonomico(ccaa: string): Tramo[] {
+        switch(ccaa){
+            case "cyl":
 
-    
+                // https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2023/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-autonomico/comunidad-castilla-leon.html
+                //Base liquidable hasta (euros)	Cuota íntegra (euros)	Resto base liquidable hasta (euros)	Tipo aplicable (%)
+                //Escala aplicable en el ejercicio 2023 por los contribuyentes residentes en dicho ejercicio en esta Comunidad Autónoma
+                //0,00	0,00	12.450,00	9
+                //12.450,00	1.120,50	7.750,00	12,00
+                //20.200,00	2.050,50	15.000,00	14,00
+                //35.200,00	4.150,50	18.207,20	18,50
+                //53.407,20	7.518,83	En adelante	21,50
+
+                return [
+                    {base_liquidable_hasta: 0, cuota_integra: 0, porcentaje_resto: 9},
+                    {base_liquidable_hasta: 12450, cuota_integra: 1120.50, porcentaje_resto: 12},
+                    {base_liquidable_hasta: 20200, cuota_integra: 2050.50, porcentaje_resto: 14},
+                    {base_liquidable_hasta: 35200, cuota_integra: 4150.50, porcentaje_resto: 18.50},
+                    {base_liquidable_hasta: 53407.20, cuota_integra: 7518.83, porcentaje_resto: 21.50},
+                ];
+
+        
+            default:
+                throw new Error(`No hay datos para la comunidad autónoma ${ccaa}`);
+        }
+    }
+  
 }

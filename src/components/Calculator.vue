@@ -4,7 +4,7 @@
         <h1>Calculadora Salario Neto</h1>
 
         <p>
-            Calculadora salario neto para el año 2023.
+            Calculadora salario neto para el año 2023 y para CyL.
         </p>
 
         <p>
@@ -65,9 +65,9 @@ function alMes(expected: number) {
     
     const pid = new PID((salarioA) => {
 
-        const calc = new IRPF(configs[config.value!.year]);
         const inp = {...config.value!, salarioA}
-        calc.calcular(inp)
+        const calc = new IRPF(configs[config.value!.year], inp);
+        calc.calcular()
 
         return calc.a.neto_mes;
 

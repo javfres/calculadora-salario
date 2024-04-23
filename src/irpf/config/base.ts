@@ -12,8 +12,9 @@ export type Tipo = {
 
 // Tramo cotización
 export type Tramo = {
-    hasta: number;
-    porcentaje: number;
+    base_liquidable_hasta: number;
+    cuota_integra: number;
+    porcentaje_resto: number;
 }
 
 export type ConfigContribuyente = {
@@ -48,7 +49,7 @@ export interface Config {
     base_maxima(grupo_cotizacion: number): number;
 
     /**
-     * Tipos de cotización con el porcentage del empleado y la empresa
+     * Tipos de cotización con el porcentaje del empleado y la empresa
      */
     tipos(): Tipo[];
 
@@ -72,5 +73,6 @@ export interface Config {
     /**
      * Tramos del IRPF
      */
-    tramos(): Tramo[];
+    escala_gravamen_estatal(): Tramo[];
+    escala_gravamen_autonomico(ccaa: string): Tramo[];
 }

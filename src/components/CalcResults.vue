@@ -48,9 +48,9 @@ onUpdateConfig(props.config);
 
 function onUpdateConfig(config: ConfigContribuyente){
 
-    const calculator = new IRPF(configs[config.year])
+    const calculator = new IRPF(configs[config.year], config)
 
-    calculator.calcular(config)
+    calculator.calcular()
 
     const has_b = situacion.value.has_b;
 

@@ -9,8 +9,8 @@ a la Seguridad Social y el impuesto del IRPF.
 
 Otras calculadoras no especifican bien los conceptos de cotización
 a la seguridad social. O no aplican correctamente el máximo de cotización.
-Muchos no calculan bien el porcentaje del irpf sobre la nómina,
-dan un porcentaje sobre el bruto cuando la base del irpf debería
+Muchos no calculan bien el porcentaje del IRPF sobre la nómina,
+dan un porcentaje sobre el bruto cuando la base del IRPF debería
 de ser el bruto menos la seguridad social.
 
 Esta calculadora da una explicación detalla del cálculo para poder detectar
@@ -23,10 +23,16 @@ Otras calculadoras:
 * https://santandersmartbank.es/calculadora-sueldo-neto/#resultados_calculadora_nomina
 * https://cincodias.elpais.com/herramientas/calculadora-sueldo-neto/#tabla_resultados
 
-## Changelog
+## Notas
+
+* ¿Base de cotización puede ser mayor que salario?: https://foros.elasesorlaboral.com/threads/base-cotizacion-mayor-que-salario.34542/
+* El cálculo de la declaración conjunta puede no ser correcto, ¿Se suman ambas bases para hacer el cálculo de las cuotas integras de IRPF?
+
+## Changelog
 
 * Abr 2024: actualización de la calculadora para 2023
     * Los datos los iguales que en 2022 excepto los cambios en las bases de cotización. Son iguales: tramos, tipos y los mínimo de CyL.
+    * Usando cálculo real de las cuotas integras y líquidas. En vez de usar los tramos de IRPF pre-calculados.
 * Nov 2022: primera versión
 
 
