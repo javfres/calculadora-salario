@@ -9,8 +9,8 @@ a la Seguridad Social y el impuesto del IRPF.
 
 Otras calculadoras no especifican bien los conceptos de cotización
 a la seguridad social. O no aplican correctamente el máximo de cotización.
-Muchos no calculan bien el porcentaje del irpf sobre la nómina,
-dan un porcentaje sobre el bruto cuando la base del irpf debería
+Muchos no calculan bien el porcentaje del IRPF sobre la nómina,
+dan un porcentaje sobre el bruto cuando la base del IRPF debería
 de ser el bruto menos la seguridad social.
 
 Esta calculadora da una explicación detalla del cálculo para poder detectar
@@ -22,6 +22,10 @@ Otras calculadoras:
 * https://www.lavanguardia.com/etc/calculadoras/calcula-tu-sueldo
 * https://santandersmartbank.es/calculadora-sueldo-neto/#resultados_calculadora_nomina
 * https://cincodias.elpais.com/herramientas/calculadora-sueldo-neto/#tabla_resultados
+
+## Notas
+
+* ¿Base de cotización puede ser mayor que salario?: https://foros.elasesorlaboral.com/threads/base-cotizacion-mayor-que-salario.34542/
 
 ## Changelog
 

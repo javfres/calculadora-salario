@@ -24,7 +24,6 @@ class Row {
     static id = 0;
     id: number;
     type: "eur" | "per" | "str" = "str";
-    decimals = 2;
     name = "";
     values: string[] = [];
 
@@ -34,15 +33,13 @@ class Row {
         this.id = (++Row.id);
     }
 
-    eur(decimals = 2): Row {
+    eur(): Row {
         this.type = "eur";
-        this.decimals = decimals;
         return this;
     }
 
-    per(decimals = 2): Row {
+    per(): Row {
         this.type = "per";
-        this.decimals = decimals;
         return this;
     }
 
@@ -50,7 +47,7 @@ class Row {
 
         if (typeof v === "number") {
             if (v != 0) {
-                v = v.toFixed(this.decimals)
+                v = formatNumberEsp(v, this.type === "eur");
                 switch(this.type) {
                     case "eur":
                         v += '€';
@@ -103,6 +100,8 @@ export class Table2 {
 </script>
   
 <script setup lang="ts">
+import { formatNumberEsp } from '@/utils';
+
 
 interface Props {
     table: Table2

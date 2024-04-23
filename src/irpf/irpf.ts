@@ -190,6 +190,8 @@ export default class CalculadoraSalario {
         this.description.line().text("Calculo del IRPF").symbol(":");
         this.description.startGroup();
 
+        // https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2023/c15-calculo-impuesto-determinacion-cuotas-integras/ejemplo-practico-calculo-cuotas-integras-autonomica.html
+
         // Quitar el mínimo personal
         const reducción = this.config.describe_minimo_contribuyente(configContribuyente, this.description);
         const d_redución_irpf = D(reducción)

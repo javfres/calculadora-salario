@@ -1,4 +1,5 @@
-import { Dinero } from "dinero.js";
+
+import { formatNumberEsp } from "../utils";
 
 type Options = {
     quotes?: boolean,
@@ -100,8 +101,8 @@ export class Line implements LineOrGroup {
             let res = (()=>{
                 switch (type) {
                     case 'text': return text;
-                    case 'euros': return `<span class="euros">${value?.toFixed(2)}€</span>`
-                    case 'percentage': return `<span class="percentage">${value?.toFixed(2)}%</span>`
+                    case 'euros': return `<span class="euros">${formatNumberEsp(value!)}€</span>`
+                    case 'percentage': return `<span class="percentage">${formatNumberEsp(value!)}%</span>`
                     case 'symbol': return text;
                     default: return "";
                 }
