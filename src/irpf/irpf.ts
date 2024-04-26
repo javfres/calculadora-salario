@@ -196,6 +196,8 @@ export default class CalculadoraSalario {
         this.description.line().text("Calculo del IRPF").symbol(":");
         this.description.startGroup();
 
+        const mpf = this.calcularMinimoPersonalFamiliar();
+
         // https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2023/c15-calculo-impuesto-determinacion-cuotas-integras/ejemplo-practico-calculo-cuotas-integras-autonomica.html
 
         let d_base_imponible = d_bruto_total;
@@ -205,7 +207,7 @@ export default class CalculadoraSalario {
         }
         
         // Otros gastos deducibles
-        const otros_gastos = D(2000);
+        const otros_gastos = D(this.config.otros_gastos_deducibles());
         d_base_imponible = d_base_imponible.subtract(otros_gastos);
         if (d_base_imponible.isNegative()){
             d_base_imponible = D(0);
@@ -226,7 +228,7 @@ export default class CalculadoraSalario {
             .text("Ahora se calcula el IRPF").symbol(":");
         this.description.startGroup()
 
-        const d_irpf = this.calcularCuotasIntegras(d_base_imponible);
+        const d_irpf = this.calcularCuotasIntegras(mpf, d_base_imponible);
         this.irpf = d_irpf.toRoundedUnit(2);
 
         this.description.line()
@@ -321,14 +323,48 @@ export default class CalculadoraSalario {
 
         const d_estado = d_seguridad_social_ab
             .add(d_seguridad_social_empresa_a)
-            .add(d_seguridad_social_empresa_b);
+            .add(d_seguridad_social_empresa_b)
+            .add(d_irpf).toRoundedUnit(2);
 
-        this.dinero_estado = d_estado.add(d_irpf).toRoundedUnit(2);
+        this.dinero_estado = d_estado;
 
         this.description.line()
             .text("El estado ingresa")
             .euros(d_estado)
             .text("en impuestos");
+
+
+        //
+        // Ahorro
+        //
+        const d_ahorro = D(configContribuyente.ahorro);
+        if (d_ahorro.greaterThan(D(0))){
+
+
+            this.description.line().text("Calculando ahorro (independiente del cálculo del salario)").symbol(":");
+
+            this.description.startGroup()
+
+            this.description.line().text("El ahorro es de").euros(d_ahorro);
+
+
+            this.description.startGroup()
+
+            const d_irpf_ahorro = this.calcularCuotasIntegrasAhorro(d_ahorro);
+            const d_irpf_total = d_irpf.add(d_irpf_ahorro);
+            this.description.endGroup()
+
+            this.description.line()
+                .text("La cuota líquida del IRPF sobre el ahorro es de")
+                .euros(d_irpf_ahorro)
+                .text("que sumada a la cuota líquida total del IRPF por el salario de")
+                .euros(d_irpf)
+                .text("da un total de")
+                .euros(d_irpf_total);
+
+
+            this.description.endGroup()
+        }
     }
 
 
@@ -342,10 +378,63 @@ export default class CalculadoraSalario {
         throw new Error("No se ha encontrado tramo para la cantidad " + cantidad.toUnit());
     }
 
+    calcularMinimoPersonalFamiliar(): Dinero.Dinero {
 
-    calcularCuotasIntegras(cantidad: Dinero.Dinero): Dinero.Dinero {
+        this.description.line().text("Calculando el mínimo personal y familiar");
+        this.description.startGroup();
 
-        const mpf = D(this.config.minimo_contribuyente(this.configContribuyente));
+    
+        let d_minimo = D(0);
+
+        const d_minimo_general = D(this.config.minimo_general());
+        d_minimo = d_minimo_general;
+        this.description.line().text("El mínimo general es de").euros(d_minimo_general);
+
+
+        const d_minimo_edad = D(this.config.minimo_edad(this.configContribuyente.edad ?? 0));
+        d_minimo = d_minimo.add(d_minimo_edad);
+        this.description.line().text("Teniendo en cuenta la edad, se añade un mínimo de").euros(d_minimo_edad);
+        
+
+        let d_minimo_hijos = D(0);
+
+        const num_hijos = this.configContribuyente.hijos ?? 0;
+
+        for(let i=1; i<=num_hijos; i++){
+            const d= D(this.config.minimo_hijo(i));
+            this.description.line().text(`Por el hijo #${i} corresponde un mínimo adicional de `).euros(d);
+            d_minimo_hijos = d_minimo_hijos.add(d);
+        }
+
+        this.description.line().text("La suma de los mínimos por hijos es de").euros(d_minimo_hijos);
+
+        if(this.configContribuyente.situacion_id === "matri-ind"){
+            d_minimo_hijos = d_minimo_hijos.divide(2);
+            this.description.line().text("Cada miembro de la pareja se beneficia de la mitad de los mínimos por hijos, es decir").euros(d_minimo_hijos);
+        }
+
+
+        d_minimo = d_minimo.add(d_minimo_hijos);
+
+        if (this.configContribuyente.situacion_id === "matri-conj"){
+            this.description.line().text("Al ser una declaración conjunta, se añade el mínimo por matrimonio").euros(D(this.config.minimo_matrimonio()));
+            d_minimo = d_minimo.add(D(this.config.minimo_matrimonio()));
+        }
+
+        if (this.configContribuyente.situacion_id === "monoparental"){
+            this.description.line().text("Al ser una declaración monoparental, se añade el mínimo por monoparental").euros(D(this.config.minimo_mono_parental()));
+            d_minimo = d_minimo.add(D(this.config.minimo_mono_parental()));
+        }
+
+        this.description.line().text("El mínimo personal y familiar final es de").euros(d_minimo);
+        this.description.endGroup();
+
+    
+        return d_minimo;
+    }
+
+
+    calcularCuotasIntegras(mpf: Dinero.Dinero, cantidad: Dinero.Dinero): Dinero.Dinero {
 
         this.description.line().text("Calculando cuotas íntegras del IRPF")
             .text("para la cantidad").euros(cantidad)
@@ -434,7 +523,6 @@ export default class CalculadoraSalario {
 
         {
             // Aplicación de la escala de gravamen autonómica al mínimo personal y familiar
-            const mpf = D(this.config.minimo_contribuyente(this.configContribuyente));
             const tramo = this.seleccionaEscala(mpf, this.config.escala_gravamen_autonomico("cyl"));
             const cuota_integra = D(tramo.cuota_integra);
             const resto = mpf.subtract(D(tramo.base_liquidable_hasta));
@@ -472,6 +560,71 @@ export default class CalculadoraSalario {
 
        return cuota_liquida;
     
+    }
+
+    calcularCuotasIntegrasAhorro(cantidad: Dinero.Dinero): Dinero.Dinero {
+
+
+        this.description.line().text("Calculando cuotas íntegras del IRPF del ahorro")
+            .text("para la cantidad").euros(cantidad);
+
+        // Cuotas estatales y autonómicas para las bases liquidables
+        let cuota_estatal, cuota_autonomica;
+
+        {
+            // Aplicación de la escala de gravamen general (estatal)
+            const tramo = this.seleccionaEscala(cantidad, this.config.escala_gravamen_estatal_ahorro());
+            const cuota_integra = D(tramo.cuota_integra);
+            const resto = cantidad.subtract(D(tramo.base_liquidable_hasta));
+            const cuota_resto = D(resto.toUnit() * (tramo.porcentaje_resto / 100));
+            const cuota_total = cuota_integra.add(cuota_resto);
+
+            this.description.line()
+                .text("CA1: El tramo de la escala de gravamen general (estatal) es")
+                .euros(tramo.base_liquidable_hasta)
+                .text("cuya cuota íntegra es")
+                .euros(cuota_integra)
+                .text("el resto de la base liquidable es")
+                .euros(resto)
+                .text("y se aplica un porcentaje del")
+                .percentage(tramo.porcentaje_resto)
+                .text("que corresponde a")
+                .euros(cuota_resto)
+                .dot()
+                .text("La cuota total es de")
+                .euros(cuota_total);
+
+            cuota_estatal = cuota_total;
+        }
+
+       
+        {
+            // Aplicación de la escala de gravamen autonómica
+            const tramo = this.seleccionaEscala(cantidad, this.config.escala_gravamen_autonomico_ahorro());
+            const cuota_integra = D(tramo.cuota_integra);
+            const resto = cantidad.subtract(D(tramo.base_liquidable_hasta));
+            const cuota_resto = D(resto.toUnit() * (tramo.porcentaje_resto / 100));
+            const cuota_total = cuota_integra.add(cuota_resto);
+
+            this.description.line()
+                .text("CA2: El tramo de la escala de gravamen autonómica es")
+                .euros(tramo.base_liquidable_hasta)
+                .text("cuya cuota íntegra es")
+                .euros(cuota_integra)
+                .text("el resto de la base liquidable es")
+                .euros(resto)
+                .text("y se aplica un porcentaje del")
+                .percentage(tramo.porcentaje_resto)
+                .text("que corresponde a")
+                .euros(cuota_resto)
+                .dot()
+                .text("La cuota total es de")
+                .euros(cuota_total);
+
+            cuota_autonomica = cuota_total;
+        }
+       
+        return cuota_autonomica.add(cuota_estatal);
     }
 
 }

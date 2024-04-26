@@ -1,5 +1,12 @@
 <template>
     <div class="theform">
+
+        <!--
+        <div class="thelabel"></div>
+        <div class="theinput">
+           Modo avanzado  <Toogle></Toogle>
+        </div> 
+        -->
     
         <div class="thelabel">Año</div>
         <div class="theinput">
@@ -24,7 +31,12 @@
             <input type="number" v-model="state.salarioA" step="1000" min="0">
             <input type="number" v-model="state.salarioB" step="1000" min="0" v-if="state.situacion_id === 'matri-conj'">
         </div>  
-        
+
+        <div class="thelabel">Ahorro</div>
+        <div class="theinput">
+            <input type="number" v-model="state.ahorro" step="1000" min="0">
+        </div>  
+
         <div class="thelabel">Edad</div>
         <div class="theinput">
             <input type="number" v-model="state.edad" step="1" min="1">
@@ -53,6 +65,8 @@
 
 <script setup lang="ts">
 
+import Toogle from './Toogle.vue';
+
 import { computed, reactive } from '@vue/reactivity';
 import { onMounted, watch, toRef } from 'vue';
 import {ConfigContribuyente, getSituacionFromID, situaciones, situacion_id_t, years, grupo_cotizacion_names} from '../irpf/config/config';
@@ -73,6 +87,7 @@ interface State {
     salarioB: number,
     edad: number,
     hijos: number,
+    ahorro: number,
 }
 
 const state = reactive<State>({
@@ -83,6 +98,7 @@ const state = reactive<State>({
     salarioB: props.start.salarioB,
     edad: props.start.edad || 30,
     hijos: props.start.hijos || 0,
+    ahorro: props.start.ahorro || 0,
 })
 
 
@@ -92,6 +108,7 @@ watch(toRef(props, "start"), start => {
     state.salarioB = start.salarioB;
     state.edad = start.edad || 30;
     state.hijos = start.hijos || 0;
+    state.ahorro = start.ahorro || 0;
 });
 
 
@@ -131,6 +148,7 @@ function onUpdateInput(){
         situacion_id: state.situacion_id,
         edad: state.edad,
         hijos: state.hijos,
+        ahorro: state.ahorro,
     };
 
     emit('newConfig', config)
@@ -143,6 +161,7 @@ watch(() => state.edad, onUpdateInput)
 watch(() => state.hijos, onUpdateInput)
 watch(() => state.grupo_cotizacion, onUpdateInput)
 watch(() => state.year, onUpdateInput)
+watch(() => state.ahorro, onUpdateInput)
 
 </script>
 

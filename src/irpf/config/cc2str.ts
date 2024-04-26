@@ -49,6 +49,10 @@ export function cc2str(cc: ConfigContribuyente): string {
         res += "g" + cc.grupo_cotizacion;
     }
 
+    if(cc.ahorro){
+        res += "a" + salary2str(cc.ahorro);
+    }
+
     return res;
 
 }
@@ -70,7 +74,7 @@ function str2salary(s?: string): number {
 
 export function str2cc(q: string): ConfigContribuyente|null {
 
-    const res = /([scim])([0-9]+k?)(?:b([0-9]+k?))?(?:e([0-9]+))?(?:h([0-9]+))?(?:y([0-9]+))?(?:g([0-9]+))?/.exec(q);
+    const res = /([scim])([0-9]+k?)(?:b([0-9]+k?))?(?:e([0-9]+))?(?:h([0-9]+))?(?:y([0-9]+))?(?:g([0-9]+))?(?:a([0-9]+k?))?/.exec(q);
     if(!res) return null;
 
     const situacion_id: situacion_id_t = ((x:string)=>{
@@ -95,6 +99,8 @@ export function str2cc(q: string): ConfigContribuyente|null {
 
     const grupo_cotizacion = +(res[7]||1);
 
+    const ahorro = str2salary(res[8]);
+
     return {
         year,
         grupo_cotizacion,
@@ -103,6 +109,7 @@ export function str2cc(q: string): ConfigContribuyente|null {
         salarioB,
         edad,
         hijos,
+        ahorro,
     }
 }
 

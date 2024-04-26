@@ -1,5 +1,4 @@
-import { Description } from "../description";
-import { Config, ConfigContribuyente, Tipo, Tramo } from "./base";
+import { Config, Tipo, Tramo } from "./base";
 
 const grupos_cotizacion = [
     {
@@ -95,107 +94,39 @@ export default class Config2022 implements Config {
     // https://tributos.jcyl.es/web/es/informacion-tributaria/informacion-basica-deducciones-aplicables.html
     //
 
-    minimo_contribuyente(config: ConfigContribuyente): number {
-        return this.describe_minimo_contribuyente(config, new Description());
+    minimo_general(): number {
+        return 5550;
     }
 
-    describe_minimo_contribuyente(config: ConfigContribuyente, description: Description): number {
-        
-        const matrimonio = 3400;
-        const monoparental = 2150;
-
-        let minimo = 0;
-
-        if(config.edad){
-            if(config.edad >= 75) {
-                minimo = 6950;
-                description.line().text("Al tener más de 75 años, corresponde una reducción de").euros(minimo);
-            } else if(config.edad >= 65) {
-                minimo = 6700;
-                description.line().text("Al tener más de 75 años, corresponde una reducción de").euros(minimo);
-            } else {
-                minimo = 5550;
-                description.line().text(`Al tener ${ config.edad } años, corresponde el mínimo personal, una reducción de`).euros(minimo);
-            }
+    minimo_edad(edad: number):number{
+        if(edad >= 75) {
+            return 6950-this.minimo_general();
+        } else if(edad >= 65) {
+            return 6700-this.minimo_general();
         } else {
-            minimo = 5550;
-            description.line().text(`El mínimo personal es una reducción de`).euros(minimo);
+            return 0;
         }
+    }
 
-        const reducciónHijoN = (num: number) =>{
-            switch(num){
-                case 1: return 2400;
-                case 2: return 2700;
-                case 3: return 4000;
-                default: return 4500;
-            }
+    minimo_matrimonio(): number {
+        return 3400;
+    }
+
+    minimo_mono_parental(): number {
+        return 2150;
+    }
+
+    minimo_hijo(n: number): number {
+        switch(n){
+            case 1: return 2400;
+            case 2: return 2700;
+            case 3: return 4000;
+            default: return 4500;
         }
+    }
 
-        if (config.situacion_id === 'matri-conj') {
-            description.line()
-                .text("Al realizar la declaración conjunta, hay una reducción adicional de:")
-                .euros(matrimonio);
-            minimo += matrimonio;
-        }
-
-
-        if(!config.hijos) return minimo;
-
-        let reducciónHijos = 0;
-
-        for(let i=1; i<=config.hijos; i++){
-            const reducción = reducciónHijoN(i);
-            description.line()
-                .text(`Por el hijo #${i} corresponde una reducción de`)
-                .euros(reducción);
-            reducciónHijos += reducción;
-        }
-
-        switch(config.situacion_id){
-
-            case "matri-ind":
-                minimo += reducciónHijos/2;
-
-                description.line()
-                    .text("La reducción total por hijos es de")
-                    .euros(reducciónHijos)
-                    .dot()
-                    .text("Pero al tener pareja cada miembro se beneficia de la mitad de la reducción:")
-                    .euros(reducciónHijos/2, {parenthesis: true})
-                    .text("que sumado al mínimo personal da un total de")
-                    .euros(minimo)
-
-                break;
-
-            case "matri-conj":
-                minimo += reducciónHijos;
-
-                description.line()
-                    .text("La reducción total por hijos es de")
-                    .euros(reducciónHijos)
-                    .dot()
-                    .text("que sumado al mínimo personal y a la reducción por declaración conjunta da un total de")
-                    .euros(minimo)
-
-                break;
-
-            case "monoparental":
-                minimo += reducciónHijos;
-                minimo += monoparental;
-
-                description.line()
-                    .text("La reducción total por hijos es de")
-                    .euros(reducciónHijos)
-                    .dot()
-                    .text("Al tratarse de una familia monoparental, hay una reducción adicional de:")
-                    .euros(monoparental)
-                    .text("que sumado al mínimo personal da un total de")
-                    .euros(minimo)
-
-                break
-        }
-
-        return minimo;
+    otros_gastos_deducibles(): number {
+        return 2000;
     }
 
     escala_gravamen_estatal(): Tramo[] {
@@ -226,6 +157,27 @@ export default class Config2022 implements Config {
         }
     }
 
+
+    // https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-ayuda-presentacion/irpf-2022/8-cumplimentacion-irpf/8_4-cuota-integra/8_4_4-gravamen-base-liquidable-ahorro.html
+    escala_gravamen_estatal_ahorro(): Tramo[] {
+        return [
+            {base_liquidable_hasta: 0, cuota_integra: 0, porcentaje_resto: 9.50},
+            {base_liquidable_hasta: 6000, cuota_integra: 570, porcentaje_resto: 10.5},
+            {base_liquidable_hasta: 50000, cuota_integra: 5190, porcentaje_resto: 11.5},
+            {base_liquidable_hasta: 200000, cuota_integra: 22440, porcentaje_resto: 13.5},
+        ];
+        
+    }
+
+
+    escala_gravamen_autonomico_ahorro(): Tramo[] {
+        return [
+            {base_liquidable_hasta: 0, cuota_integra: 0, porcentaje_resto: 9.50},
+            {base_liquidable_hasta: 6000, cuota_integra: 570, porcentaje_resto: 10.5},
+            {base_liquidable_hasta: 50000, cuota_integra: 5190, porcentaje_resto: 11.5},
+            {base_liquidable_hasta: 200000, cuota_integra: 22440, porcentaje_resto: 13.5},
+        ];
+    }
 
     
 }

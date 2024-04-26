@@ -50,3 +50,11 @@ npm run serve
 ```
 npm run build
 ```
+
+
+// 51686.37
+// 472.15
+
+http://localhost:8080/?q=s51686e30a472
+
+89/472

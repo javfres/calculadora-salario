@@ -47,6 +47,7 @@ const start = ref<ConfigContribuyente>({
     salarioB: 0,
     edad: 30,
     hijos: 0,
+    ahorro: 0,
 })
 
 const fromURL = getCCFromURL();
