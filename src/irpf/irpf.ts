@@ -16,6 +16,10 @@ export class Resultado {
     neto_mes = 0;
     seguridad_social_empresa = 0;  
     total_empresa = 0;
+
+    irpf = 0;
+    irpf_porcentaje = 0;
+    dinero_estado = 0;
 }
 
 export default class CalculadoraSalario {
@@ -26,14 +30,6 @@ export default class CalculadoraSalario {
     // A y B para declaración conjunta
     a = new Resultado();
     b = new Resultado();
-
-    irpf = 0;
-    irpf_porcentaje = 0;
-
-    bruto_total = 0;
-    neto_total = 0;
-
-    dinero_estado = 0;
 
     description: Description = new Description();
 
@@ -62,28 +58,25 @@ export default class CalculadoraSalario {
         //
         const d_bruto_a = D(bruto_a);
         const d_bruto_b = D(bruto_b)
-        const d_bruto_total = d_bruto_a.add(d_bruto_b);
 
         if(!has_b){
-            this.description.line().text("El sueldo bruto es de").euros(d_bruto_total);
-            this.a.bruto = d_bruto_total.toRoundedUnit(2);
+            this.description.line().text("El sueldo bruto es de").euros(d_bruto_a);
+            this.a.bruto = d_bruto_a.toRoundedUnit(2);
             this.b.bruto = 0;
-            this.bruto_total = d_bruto_total.toRoundedUnit(2);
         } else {
             this.description.line()
                 .text("El sueldo bruto A es de").euros(d_bruto_a).coma()
                 .text("el sueldo bruto B es de").euros(d_bruto_b).dot()
-                .text("El sueldo bruto total es de").euros(d_bruto_total)
+                .text("El sueldo bruto total es de").euros(d_bruto_a.add(d_bruto_b));
             this.a.bruto = d_bruto_a.toRoundedUnit(2);
             this.b.bruto = d_bruto_b.toRoundedUnit(2);
-            this.bruto_total = d_bruto_total.toRoundedUnit(2);
         }
 
         //
         // Calculo seguridad social
         //
-        let d_seguridad_social_ab = D(0);
         let d_seguridad_social_a = D(0);
+        let d_seguridad_social_b = D(0);
         let d_seguridad_social_empresa_a = D(0);
         let d_seguridad_social_empresa_b = D(0);
 
@@ -168,7 +161,6 @@ export default class CalculadoraSalario {
                 .text("En total, la aportación a la seguridad social por la empresa es:")
                 .euros(d_seguridad_social_empresa);
 
-            d_seguridad_social_ab = d_seguridad_social_ab.add(d_seguridad_social)
 
             if(isA){
                 this.a.seguridad_social = d_seguridad_social.toRoundedUnit(2);
@@ -178,6 +170,7 @@ export default class CalculadoraSalario {
             } else {
                 this.b.seguridad_social = d_seguridad_social.toRoundedUnit(2);
                 this.b.seguridad_social_empresa = d_seguridad_social_empresa.toRoundedUnit(2);
+                d_seguridad_social_b = d_seguridad_social;
                 d_seguridad_social_empresa_b = d_seguridad_social_empresa;
             }
 
@@ -192,69 +185,47 @@ export default class CalculadoraSalario {
         //
         // Calculo IRPF
         //
-
         this.description.line().text("Calculo del IRPF").symbol(":");
         this.description.startGroup();
 
         const mpf = this.calcularMinimoPersonalFamiliar();
 
-        // https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2023/c15-calculo-impuesto-determinacion-cuotas-integras/ejemplo-practico-calculo-cuotas-integras-autonomica.html
+        let d_irpf_a = D(0);
+        let d_irpf_b = D(0);
+        let d_irpf_ab = D(0);
 
-        let d_base_imponible = d_bruto_total;
-        d_base_imponible = d_base_imponible.subtract(d_seguridad_social_ab)
-        if (d_base_imponible.isNegative()){
-            d_base_imponible = D(0);
+        if (configContribuyente.situacion_id === "matri-ind") {
+
+            this.description.line().text("Calculo de IRPF para A").symbol(":");
+            this.description.startGroup();
+            d_irpf_a = this.calcular_irpf(d_bruto_a, d_seguridad_social_a, mpf, this.a);
+            this.description.endGroup();
+
+            this.description.line().text("Calculo de IRPF para B").symbol(":");
+            this.description.startGroup();
+            d_irpf_b = this.calcular_irpf(d_bruto_b, d_seguridad_social_b, mpf, this.b);
+            this.description.endGroup();
+
+        } else if (configContribuyente.situacion_id === "matri-conj") {
+
+            const d_bruto = d_bruto_a.add(d_bruto_b);
+            const d_seguridad_social = d_seguridad_social_a.add(d_seguridad_social_b);
+
+            this.description.line().text("Calculo de IRPF conjunto").symbol(":");
+            this.description.startGroup();
+            d_irpf_ab = this.calcular_irpf(d_bruto, d_seguridad_social, mpf, this.a);
+            this.description.endGroup();
+
+        } else {
+
+            this.description.line().text("Calculo de IRPF").symbol(":");
+            this.description.startGroup();
+            d_irpf_a = this.calcular_irpf(d_bruto_a, d_seguridad_social_a, mpf, this.a);
+            this.description.endGroup();
+
         }
-        
-        // Otros gastos deducibles
-        const otros_gastos = D(this.config.otros_gastos_deducibles());
-        d_base_imponible = d_base_imponible.subtract(otros_gastos);
-        if (d_base_imponible.isNegative()){
-            d_base_imponible = D(0);
-        }
-
-        this.description.line()
-            .text("La base imponible sobre la que se aplica el IRPF es")
-            .euros(d_base_imponible)
-            .dot()
-            .text("Esta base es el bruto de")
-            .euros(d_bruto_total)
-            .text("menos la contribución a la seguridad social")
-            .euros(d_seguridad_social_ab)
-            .text(`y menos "otros gastos deducibles"`)
-            .euros(otros_gastos);
-
-        this.description.line()
-            .text("Ahora se calcula el IRPF").symbol(":");
-        this.description.startGroup()
-
-        const d_irpf = this.calcularCuotasIntegras(mpf, d_base_imponible);
-        this.irpf = d_irpf.toRoundedUnit(2);
-
-        this.description.line()
-            .text("La cuota líquida total del IRPF es de")
-            .euros(d_irpf);
-        this.description.endGroup()
-
-
-        const d_neto_total = d_bruto_total.subtract(d_seguridad_social_ab).subtract(d_irpf);
-        this.neto_total = d_neto_total.toRoundedUnit(2);
-        this.a.neto = d_neto_total.toRoundedUnit(2);
-
-        this.description.line()
-            .text("El salario neto es por tanto de")
-            .euros(d_neto_total);
-
-
-        // El porcentaje de irpf es sobre el bruto 
-        this.irpf_porcentaje = 100 * d_irpf.toUnit() / d_bruto_total.toUnit()
-
-        this.description.line()
-            .text("Lo que corresponde a un porcentaje de IRPF en nómina de")
-            .percentage(this.irpf_porcentaje);
 
         this.description.endGroup();
-
 
         //
         // Neto
@@ -263,40 +234,25 @@ export default class CalculadoraSalario {
         this.description.line().text("Calculo del sueldo neto").symbol(":");
         this.description.startGroup();
 
+        if(configContribuyente.situacion_id === "matri-conj"){
 
-        if(!has_b){
-            this.a.neto_mes = d_neto_total.divide(12).toRoundedUnit(2);
+            const reparto = this.reparto_neto_conjunta(d_bruto_a, d_bruto_b, d_seguridad_social_a, d_seguridad_social_b, d_irpf_ab, this.a, this.b);
+            d_irpf_a = reparto.d_irpf_a;
+            d_irpf_b = reparto.d_irpf_b;
+            this.calculo_neto(d_bruto_a, d_seguridad_social_a, d_irpf_a, this.a);
+            this.calculo_neto(d_bruto_b, d_seguridad_social_b, d_irpf_b, this.b);
 
-            this.description.line()
-                .text("El sueldo neto mensual es de")
-                .euros(this.a.neto_mes)
-
+        } else if(configContribuyente.situacion_id === "matri-ind"){
+            this.calculo_neto(d_bruto_a, d_seguridad_social_a, d_irpf_a, this.a);
+            this.calculo_neto(d_bruto_b, d_seguridad_social_b, d_irpf_b, this.b);
         } else {
-
-            const d_neto_a = (d_bruto_a.subtract(d_seguridad_social_a)).multiply((1-this.irpf_porcentaje/100));
-            const d_neto_b = d_neto_total.subtract(d_neto_a);
-
-            this.a.neto = d_neto_a.toRoundedUnit(2);
-            this.b.neto = d_neto_b.toRoundedUnit(2);
-
-            this.description.line()
-                .text("El sueldo neto es de")
-                .euros(this.a.neto)
-                .text("y")
-                .euros(this.b.neto)
-
-            this.a.neto_mes = d_neto_a.divide(12).toRoundedUnit(2);
-            this.b.neto_mes = d_neto_b.divide(12).toRoundedUnit(2);
-
-            this.description.line()
-            .text("El sueldo neto mensual es de")
-            .euros(this.a.neto_mes)
-            .text("y")
-            .euros(this.b.neto_mes)
+            this.calculo_neto(d_bruto_a, d_seguridad_social_a, d_irpf_a, this.a);
         }
 
+
+
         this.description.endGroup();
-        
+
         //
         // Total empresa
         //
@@ -317,21 +273,57 @@ export default class CalculadoraSalario {
                 .euros(this.b.total_empresa)
         }
 
+
+        
+        
+
         //
         // Total estado
         //
 
-        const d_estado = d_seguridad_social_ab
+        this.description.line().text("Calculo de los impuestos que el estado ingresa").symbol(":");
+        this.description.startGroup();
+
+        if(has_b) {
+            this.description.line().text("Calculo para A").symbol(":");
+            this.description.startGroup()
+        }
+
+        const d_estado_a = D(0)
+            .add(d_seguridad_social_a)
             .add(d_seguridad_social_empresa_a)
-            .add(d_seguridad_social_empresa_b)
-            .add(d_irpf).toRoundedUnit(2);
+            .add(d_irpf_a);
 
-        this.dinero_estado = d_estado;
-
-        this.description.line()
-            .text("El estado ingresa")
-            .euros(d_estado)
+        this.description.line().text("El estado ingresa")
+            .euros(d_estado_a)
             .text("en impuestos");
+
+        this.a.dinero_estado = d_estado_a.toRoundedUnit(2);
+
+        if(has_b){
+            this.description.line().text("Calculo para B").symbol(":");
+
+            const d_estado_b = D(0)
+            .add(d_seguridad_social_b)
+            .add(d_seguridad_social_empresa_b)
+            .add(d_irpf_b);
+
+            this.description.line().text("El estado ingresa")
+                .euros(d_estado_b)
+                .text("en impuestos");
+
+            const d_estado_total = d_estado_a.add(d_estado_b);
+
+            this.description.line().text("En total, el estado ingresa")
+                .euros(d_estado_total)
+                .text("en impuestos");
+
+            this.b.dinero_estado = d_estado_b.toRoundedUnit(2);
+
+            this.description.endGroup()
+        }
+
+        
 
 
         //
@@ -351,20 +343,21 @@ export default class CalculadoraSalario {
             this.description.startGroup()
 
             const d_irpf_ahorro = this.calcularCuotasIntegrasAhorro(d_ahorro);
-            const d_irpf_total = d_irpf.add(d_irpf_ahorro);
+            const d_irpf_total = d_irpf_a.add(d_irpf_ahorro);
             this.description.endGroup()
 
             this.description.line()
                 .text("La cuota líquida del IRPF sobre el ahorro es de")
                 .euros(d_irpf_ahorro)
                 .text("que sumada a la cuota líquida total del IRPF por el salario de")
-                .euros(d_irpf)
+                .euros(d_irpf_a)
                 .text("da un total de")
                 .euros(d_irpf_total);
 
 
             this.description.endGroup()
         }
+       
     }
 
 
@@ -625,6 +618,125 @@ export default class CalculadoraSalario {
         }
        
         return cuota_autonomica.add(cuota_estatal);
+    }
+
+    calcular_irpf(d_bruto: Dinero.Dinero, d_seguridad_social: Dinero.Dinero, mpf: Dinero.Dinero, r: Resultado): Dinero.Dinero {
+ 
+        let d_base_imponible = d_bruto;
+        d_base_imponible = d_base_imponible.subtract(d_seguridad_social)
+        if (d_base_imponible.isNegative()){
+            d_base_imponible = D(0);
+        }
+        
+        // Otros gastos deducibles
+        const otros_gastos = D(this.config.otros_gastos_deducibles());
+        d_base_imponible = d_base_imponible.subtract(otros_gastos);
+        if (d_base_imponible.isNegative()){
+            d_base_imponible = D(0);
+        }
+
+        this.description.line()
+            .text("La base imponible sobre la que se aplica el IRPF es")
+            .euros(d_base_imponible)
+            .dot()
+            .text("Esta base es el bruto de")
+            .euros(d_bruto)
+            .text("menos la contribución a la seguridad social")
+            .euros(d_seguridad_social)
+            .text(`y menos "otros gastos deducibles"`)
+            .euros(otros_gastos);
+
+        if (mpf.greaterThan(d_base_imponible)){
+            this.description.line()
+                .text("El mínimo personal y familiar es mayor que la base imponible, por lo que irpf es 0");
+            r.irpf = 0;
+            return D(0);
+        }
+
+
+        this.description.line()
+            .text("Ahora se calcula el IRPF").symbol(":");
+        this.description.startGroup()
+
+        let d_irpf = this.calcularCuotasIntegras(mpf, d_base_imponible);
+
+        this.description.line()
+            .text("La cuota líquida total del IRPF es de")
+            .euros(d_irpf);
+        this.description.endGroup()
+
+        if(d_irpf.isNegative()){
+            this.description.line().text("El IRPF es negativo, ajustar a 0");
+            d_irpf = D(0);
+        }
+
+        r.irpf = d_irpf.toRoundedUnit(2);
+
+    
+
+        return d_irpf;
+    }
+
+
+    reparto_neto_conjunta(d_bruto_a: Dinero.Dinero, d_bruto_b: Dinero.Dinero, d_seguridad_social_a: Dinero.Dinero, d_seguridad_social_b: Dinero.Dinero, d_irpf: Dinero.Dinero, a: Resultado, b: Resultado): {d_irpf_a: Dinero.Dinero, d_irpf_b: Dinero.Dinero} {
+
+        const d_base_a = d_bruto_a.subtract(d_seguridad_social_a);
+        const d_base_b = d_bruto_b.subtract(d_seguridad_social_b);
+
+        const d_total = d_base_a.add(d_base_b);
+        const percentage_a = d_base_a.toUnit() / d_total.toUnit();
+
+        const d_irpf_a = d_irpf.multiply(percentage_a);
+        const d_irpf_b = d_irpf.subtract(d_irpf_a);
+
+        a.irpf = d_irpf_a.toRoundedUnit(2);
+        b.irpf = d_irpf_b.toRoundedUnit(2);
+
+        this.description.line()
+            .text("Vamos a repartir el irpf A y B de forma proporcional a sus bases imponibles")
+            .text("El IRPF para A es de")
+            .euros(d_irpf_a)
+            .text("y para B es de")
+            .euros(d_irpf_b);
+
+        return {d_irpf_a, d_irpf_b};
+
+    }
+
+
+
+    calculo_neto(d_bruto: Dinero.Dinero, d_seguridad_social: Dinero.Dinero, d_irpf: Dinero.Dinero, r: Resultado): Dinero.Dinero {
+
+        let d_neto = d_bruto.subtract(d_seguridad_social).subtract(d_irpf);
+
+        if (d_neto.isNegative()){
+            d_neto = D(0);
+        }   
+
+
+        r.neto = d_neto.toRoundedUnit(2);
+        r.neto_mes = d_neto.divide(12).toRoundedUnit(2);    
+
+        this.description.line()
+            .text("El salario neto es por tanto de")
+            .euros(d_neto)
+            .text("y el neto mensual es de")
+            .euros(r.neto_mes);
+
+        // El porcentaje de irpf es sobre el bruto
+        if(d_irpf.isZero()){
+            r.irpf_porcentaje = 0;
+        } else {
+            r.irpf_porcentaje = 100 * d_irpf.toUnit() / d_bruto.toUnit()
+        }
+
+        this.description.line()
+            .text("Lo que corresponde a un porcentaje de IRPF en nómina de")
+            .percentage(r.irpf_porcentaje);
+
+
+        return d_neto;
+
     }
 
 }

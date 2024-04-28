@@ -26,7 +26,6 @@ Otras calculadoras:
 ## Notas
 
 * ¿Base de cotización puede ser mayor que salario?: https://foros.elasesorlaboral.com/threads/base-cotizacion-mayor-que-salario.34542/
-* El cálculo de la declaración conjunta puede no ser correcto, ¿Se suman ambas bases para hacer el cálculo de las cuotas integras de IRPF?
 
 ## Changelog
 

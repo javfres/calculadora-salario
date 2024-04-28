@@ -29,7 +29,7 @@
         <div class="thelabel">Bruto anual</div>
         <div class="theinput">
             <input type="number" v-model="state.salarioA" step="1000" min="0">
-            <input type="number" v-model="state.salarioB" step="1000" min="0" v-if="state.situacion_id === 'matri-conj'">
+            <input type="number" v-model="state.salarioB" step="1000" min="0" v-if="['matri-conj', 'matri-ind'].includes(state.situacion_id)">
         </div>  
 
         <div class="thelabel">Ahorro</div>
