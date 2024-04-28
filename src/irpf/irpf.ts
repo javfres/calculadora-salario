@@ -50,7 +50,7 @@ export default class CalculadoraSalario {
         // Create a new description object
         this.description = new Description();
 
-        this.description.line().text("Calculando salario para el año").text("" + this.config.year(), {quotes: true});
+        this.description.line().text("Calculando salario para el año").text("" + this.configContribuyente.year, {quotes: true});
 
 
         //
@@ -97,8 +97,8 @@ export default class CalculadoraSalario {
             const d_bruto = D(bruto);
 
             // Base sobre la que se aplican los porcentajes
-            const b_min = this.config.base_minima(configContribuyente.grupo_cotizacion) * 12;
-            const b_max = this.config.base_maxima(configContribuyente.grupo_cotizacion) * 12;
+            const b_min = this.base_minima() * 12;
+            const b_max = this.base_maxima() * 12;
 
             const d_base_seguridad_social = D(Math.max(b_min,Math.min(b_max, bruto)));
 
@@ -738,6 +738,22 @@ export default class CalculadoraSalario {
         return d_neto;
 
     }
+
+    base_minima(): number {
+        const g = this.config.grupos_cotizacion().find(g => g.grupo === this.configContribuyente.grupo_cotizacion)
+         if (g) {
+             return g.base_minima;
+         }
+         return 0;
+     }
+ 
+     base_maxima(): number {
+        const g = this.config.grupos_cotizacion().find(g => g.grupo === this.configContribuyente.grupo_cotizacion)
+         if (g) {
+             return g.base_maxima;
+         }
+         return 0;
+     }
 
 }
 

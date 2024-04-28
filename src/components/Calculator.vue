@@ -79,5 +79,30 @@ function alMes(expected: number) {
     start.value = { ...config.value!,  salarioA} ;
 }
 
+/*
+let prev = 0;
+for(let i = 0; i < 100000; i+=1000){
+   const c: ConfigContribuyente = {
+         year: 2023,
+         grupo_cotizacion: 1,
+         situacion_id: situaciones[0].id,
+         salarioA: i,
+         salarioB: 0,
+         edad: 30,
+         hijos: 0,
+         ahorro: 0,
+    }
+    const calc = new IRPF(configs[2023], c);
+    calc.calcular()
+
+    const pagar = calc.a.irpf - prev;
+    prev = calc.a.irpf;
+    const p = pagar / 1000;
+
+    console.log(i, pagar, 100*p);
+}
+*/
+
+
 
 </script>

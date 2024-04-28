@@ -1,73 +1,54 @@
-import { Config, Tipo, Tramo } from "./base";
-
-const grupos_cotizacion = [
-    {
-        grupo: 1,
-        base_minima: 1759.5,
-        base_maxima: 4495.50
-    },
-    {
-        grupo: 2,
-        base_minima: 1459.2,
-        base_maxima: 4495.50
-    },
-    {
-        grupo: 3,
-        base_minima: 1269.3,
-        base_maxima: 4495.50
-    },
-    {
-        grupo: 4,
-        base_minima: 1260,
-        base_maxima: 4495.50
-    },
-    {
-        grupo: 5,
-        base_minima: 1260,
-        base_maxima: 4495.50
-    },
-    {
-        grupo: 6,
-        base_minima: 1260,
-        base_maxima: 4495.50
-    },
-    {
-        grupo: 7,
-        base_minima: 1260,
-        base_maxima: 4495.50
-    },
-];
+import { Config, GroupCotizacion, Tipo, Tramo } from "./base";
 
 
 export default class Config2023 implements Config {
-
-    year(): number {
-        return 2023;
-    }
 
     salario_minimo_interprofesional(): number {
         return 15876;
     }
 
-    //
     // https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537?changeLanguage=es
-    //
 
-    base_minima(grupo_cotizacion: number): number {
-       const g = grupos_cotizacion.find(g => g.grupo === grupo_cotizacion)
-        if (g) {
-            return g.base_minima;
-        }
-        return 0;
+    grupos_cotizacion(): GroupCotizacion[] {
+        return [
+            {
+                grupo: 1,
+                base_minima: 1759.5,
+                base_maxima: 4495.50
+            },
+            {
+                grupo: 2,
+                base_minima: 1459.2,
+                base_maxima: 4495.50
+            },
+            {
+                grupo: 3,
+                base_minima: 1269.3,
+                base_maxima: 4495.50
+            },
+            {
+                grupo: 4,
+                base_minima: 1260,
+                base_maxima: 4495.50
+            },
+            {
+                grupo: 5,
+                base_minima: 1260,
+                base_maxima: 4495.50
+            },
+            {
+                grupo: 6,
+                base_minima: 1260,
+                base_maxima: 4495.50
+            },
+            {
+                grupo: 7,
+                base_minima: 1260,
+                base_maxima: 4495.50
+            },
+        ];
     }
 
-    base_maxima(grupo_cotizacion: number): number {
-        const g = grupos_cotizacion.find(g => g.grupo === grupo_cotizacion)
-        if (g) {
-            return g.base_maxima;
-        }
-        return 0;
-    }
 
     tipos(): Tipo[] {
         return [

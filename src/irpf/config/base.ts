@@ -1,5 +1,10 @@
-import { Description } from "../description";
 import { situacion_id_t } from "./config";
+
+export type GroupCotizacion = {
+    grupo: number;
+    base_minima: number;
+    base_maxima: number;
+}
 
 /**
  * Tipo Cotización
@@ -31,24 +36,12 @@ export type ConfigContribuyente = {
 
 export interface Config {
 
-    /** El año de la configuración */
-    year(): number;
-
     //
     // Seguridad Social
     //
 
-    /** 
-     * Base mínima de cotización
-     * https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537?changeLanguage=es
-     */
-    base_minima(grupo_cotizacion: number): number;
-
-    /** 
-     * Base máxima de cotización
-     */
-    base_maxima(grupo_cotizacion: number): number;
-
+    grupos_cotizacion(): GroupCotizacion[];
+   
     /**
      * Tipos de cotización con el porcentaje del empleado y la empresa
      */
@@ -66,22 +59,6 @@ export interface Config {
 
     otros_gastos_deducibles(): number;
 
-    /**
-     * Mínimo personal + familiar según corresponda
-     * @param config Configuración del contribuyente
-     */
-    //minimo_contribuyente(config: ConfigContribuyente): number;
-
-    /**
-     * Añade a la descripción los detalles del mínimo del contribuyente
-     * @param config 
-     * @param description 
-     */
-    //describe_minimo_contribuyente(config: ConfigContribuyente, description: Description): number;
-
-    /**
-     * Tramos del IRPF
-     */
     escala_gravamen_estatal(): Tramo[];
     escala_gravamen_autonomico(ccaa: string): Tramo[];
 

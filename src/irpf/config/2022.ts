@@ -1,70 +1,50 @@
-import { Config, Tipo, Tramo } from "./base";
-
-const grupos_cotizacion = [
-    {
-        grupo: 1,
-        base_minima: 1629.3,
-        base_maxima: 4139.4,
-    },
-    {
-        grupo: 2,
-        base_minima: 1351.2,
-        base_maxima: 4139.4,
-    },
-    {
-        grupo: 3,
-        base_minima: 1175.4,
-        base_maxima: 4139.4,
-    },
-    {
-        grupo: 4,
-        base_minima: 1166.7,
-        base_maxima: 4139.4,
-    },
-    {
-        grupo: 5,
-        base_minima: 1166.7,
-        base_maxima: 4139.4,
-    },
-    {
-        grupo: 6,
-        base_minima: 1166.7,
-        base_maxima: 4139.4,
-    },
-    {
-        grupo: 7,
-        base_minima: 1166.7,
-        base_maxima: 4139.4,
-    },
-];
+import { Config, GroupCotizacion, Tipo, Tramo } from "./base";
 
 
 export default class Config2022 implements Config {
 
-    year(): number {
-        return 2022;
-    }
-
-    //
     // https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537?changeLanguage=es
-    //
 
-    base_minima(grupo_cotizacion: number): number {
-       const g = grupos_cotizacion.find(g => g.grupo === grupo_cotizacion)
-        if (g) {
-            return g.base_minima;
-        }
-        return 0;
+    grupos_cotizacion(): GroupCotizacion[] {
+        return [
+            {
+                grupo: 1,
+                base_minima: 1629.3,
+                base_maxima: 4139.4,
+            },
+            {
+                grupo: 2,
+                base_minima: 1351.2,
+                base_maxima: 4139.4,
+            },
+            {
+                grupo: 3,
+                base_minima: 1175.4,
+                base_maxima: 4139.4,
+            },
+            {
+                grupo: 4,
+                base_minima: 1166.7,
+                base_maxima: 4139.4,
+            },
+            {
+                grupo: 5,
+                base_minima: 1166.7,
+                base_maxima: 4139.4,
+            },
+            {
+                grupo: 6,
+                base_minima: 1166.7,
+                base_maxima: 4139.4,
+            },
+            {
+                grupo: 7,
+                base_minima: 1166.7,
+                base_maxima: 4139.4,
+            },
+        ];
     }
-
-    base_maxima(grupo_cotizacion: number): number {
-        const g = grupos_cotizacion.find(g => g.grupo === grupo_cotizacion)
-        if (g) {
-            return g.base_maxima;
-        }
-        return 0;
-    }
-
+  
     tipos(): Tipo[] {
         return [
             {
