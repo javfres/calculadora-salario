@@ -1,8 +1,11 @@
+
 import Config2022 from "./2022";
 import Config2023 from "./2023";
+import Config2024 from "./2024";
 import { Config } from "./base";
 
 export const years = [
+    2024,
     2023,
     2022
 ] as const;
@@ -10,6 +13,7 @@ export const years = [
 export const configs: { [id: number]: Config } = {
     2023: new Config2023(),
     2022: new Config2022(),
+    2024: new Config2024(),
 };
 
 export { Config, ConfigContribuyente } from "./base";

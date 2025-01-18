@@ -65,8 +65,6 @@
 
 <script setup lang="ts">
 
-import Toogle from './Toogle.vue';
-
 import { computed, reactive } from '@vue/reactivity';
 import { onMounted, watch, toRef } from 'vue';
 import {ConfigContribuyente, getSituacionFromID, situaciones, situacion_id_t, years, grupo_cotizacion_names} from '../irpf/config/config';

@@ -4,7 +4,7 @@
         <h1>Calculadora Salario Neto</h1>
 
         <p>
-            Calculadora salario neto para el año 2023 y para CyL.
+            Calculadora salario neto para el año 2024 y para CyL.
         </p>
 
         <p>
@@ -40,7 +40,7 @@ import { updateURL, getCCFromURL } from '@/irpf/config/cc2str';
 
 
 const start = ref<ConfigContribuyente>({
-    year: 2023,
+    year: 2024,
     grupo_cotizacion: 1,
     situacion_id: situaciones[0].id,
     salarioA: 20000,
