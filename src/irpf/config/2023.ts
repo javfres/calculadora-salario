@@ -4,7 +4,7 @@ import { Config, GroupCotizacion, Tipo, Tramo } from "./base";
 export default class Config2023 implements Config {
 
     salario_minimo_interprofesional(): number {
-        return 15876;
+        return 15120;
     }
 
     // https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537?changeLanguage=es

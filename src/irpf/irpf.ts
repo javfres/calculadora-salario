@@ -1,7 +1,7 @@
 
 import Dinero from 'dinero.js'
 import { Config, ConfigContribuyente, situaciones } from './config/config';
-import { Description } from './description';
+import { Description } from '../utils/description';
 import { Tramo } from './config/base';
 
 function D(amount: number): Dinero.Dinero {

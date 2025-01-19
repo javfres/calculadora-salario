@@ -1,12 +1,17 @@
 <template>
     <div class="results">
     
+        <!--
+        
+      
         <template v-if="barItems">
             <Bar :items="barItems"></Bar>
             <SalaryTable :table="tables.empleado"></SalaryTable>
             <SalaryTable :table="tables.empresa"></SalaryTable>
-            <DescriptionTable :descriptions="descriptions"></DescriptionTable>
         </template>
+    -->
+
+        <DescriptionTable :descriptions="descriptions"></DescriptionTable>
 
     </div>
 </template>
@@ -14,25 +19,26 @@
 
 <script setup lang="ts">
 
-import IRPF from '../irpf/irpf';
-import {ConfigContribuyente, configs, getSituacionFromID} from '../irpf/config/config';
-import Bar, {BarItem} from './Bar.vue';
-import SalaryTable, { Table2 } from './Table.vue';
-import DescriptionTable from './DescriptionTable.vue';
+import IRPF from '../../irpf/irpf';
+import {ConfigContribuyente, configs, getSituacionFromID} from '../../irpf/config/config';
+//import Bar, {BarItem} from './Bar.vue';
+//import SalaryTable, { Table2 } from './Table.vue';
 import { computed, reactive, ref, Ref, toRef, watch } from 'vue';
-import { Description } from '@/irpf/description';
+import { Description } from '@/utils/description';
+import { ConfigFlexibleContribuyente } from '@/flexible/config/config';
+import CalculadoraFlexible from '@/flexible/flexible';
+import DescriptionTable from '../common/DescriptionTable.vue';
 
 
 export interface Props {
-    config: ConfigContribuyente;
+    config: ConfigFlexibleContribuyente;
 }
 
 const props = defineProps<Props>();
 
 const descriptions: Ref<Description[]> = ref([]);
 
-const barItems: Ref<BarItem[]> = ref([]);
-
+/*
 const tables = reactive({
     empleado: new Table2(),
     empresa: new Table2(),
@@ -40,18 +46,20 @@ const tables = reactive({
 
 
 const situacion = computed(() => getSituacionFromID(props.config.situacion_id))
+*/
 
 watch(toRef(props, "config"), onUpdateConfig);
 
 // First time
 onUpdateConfig(props.config);
 
-function onUpdateConfig(config: ConfigContribuyente){
+function onUpdateConfig(config: ConfigFlexibleContribuyente){
 
-    const calculator = new IRPF(configs[config.year], config)
+    const calculator = new CalculadoraFlexible(config, 2024)
 
     calculator.calcular()
 
+    /*
     const has_b = situacion.value.has_b;
 
 
@@ -132,6 +140,7 @@ function onUpdateConfig(config: ConfigContribuyente){
 
 
     }
+        */
 
     descriptions.value = [calculator.description];
 

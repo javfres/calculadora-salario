@@ -1,10 +1,27 @@
 <template>
-  <Calculator/>
+  <Tabs
+    :items="[
+      {id: 'calculator', name: 'Calculadora'},
+      {id: 'flexible',   name: 'Retribución flexible'},
+    ]"
+    @tab-change="tab = $event"
+  />
+  <Calculator v-if="tab === 'calculator'" :year="year" />
+  <Flexible v-if="tab === 'flexible'" :year="year"/>
 </template>
 
 <script setup lang="ts">
 
-import Calculator from './components/Calculator.vue';
+import { ref } from 'vue';
+
+import Tabs from './components/Tabs.vue';
+import Calculator from './components/calculator/Calculator.vue';
+import Flexible from './components/flexible/Flexible.vue';
+
+const tab = ref('calculator');
+
+// This is the main year
+const year = 2023;
 
 </script>
 
@@ -14,5 +31,8 @@ import Calculator from './components/Calculator.vue';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+
+  display: flex;
+  flex-direction: column;
 }
 </style>
