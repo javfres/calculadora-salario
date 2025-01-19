@@ -7,7 +7,7 @@ type Options = {
 }
 
 type Item = {
-    type: 'text' | 'euros' | 'percentage' | 'symbol',
+    type: 'text' | 'euros' | 'percentage' | 'symbol' | 'number'
     text?: string,
     value?: number,
     options: Options,
@@ -30,7 +30,6 @@ export class Line implements LineOrGroup {
     }
 
     private push(item: Partial<Item>): Line {
-
         const item2: Item = {
             ...{
                 type: "text",
@@ -44,10 +43,18 @@ export class Line implements LineOrGroup {
     }
     
     text(text:string, options:Options = {}): Line {
-
         this.push({
             type: "text",
             text,
+            options,
+        });
+        return this;
+    }
+
+    number(value:number, options:Options = {}): Line {
+        this.push({
+            type: "number",
+            value,
             options,
         });
         return this;
@@ -104,6 +111,7 @@ export class Line implements LineOrGroup {
                     case 'euros': return `<span class="euros">${formatNumberEsp(value!)}€</span>`
                     case 'percentage': return `<span class="percentage">${formatNumberEsp(value!)}%</span>`
                     case 'symbol': return text;
+                    case 'number': return `${value}`;
                     default: return "";
                 }
             })();
