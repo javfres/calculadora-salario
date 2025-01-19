@@ -67,7 +67,7 @@
 
 import { computed, reactive } from '@vue/reactivity';
 import { onMounted, watch, toRef } from 'vue';
-import {ConfigContribuyente, getSituacionFromID, situaciones, situacion_id_t, years, grupo_cotizacion_names} from '../irpf/config/config';
+import {ConfigContribuyente, getSituacionFromID, situaciones, situacion_id_t, years, grupo_cotizacion_names} from '../../irpf/config/config';
 
 export interface Props {
     start: ConfigContribuyente;

@@ -26,7 +26,7 @@ export type BarItem = {
 </script>
   
 <script setup lang="ts">
-import { formatNumberEsp } from '@/utils';
+import { formatNumberEsp } from '@/utils/utils';
 
 
 interface Props {

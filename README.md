@@ -49,3 +49,7 @@ npm run serve
 ```
 npm run build
 ```
+
+### TODO
+
+* Mover smi a fichero independiente 2025 16576

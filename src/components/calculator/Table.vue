@@ -17,7 +17,7 @@
 </template>
   
 <script lang="ts">
-import { formatNumberEsp } from '@/utils';
+import { formatNumberEsp } from '@/utils/utils';
 
 class Row {
     table: Table2;

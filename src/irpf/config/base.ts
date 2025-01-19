@@ -36,6 +36,8 @@ export type ConfigContribuyente = {
 
 export interface Config {
 
+    salario_minimo_interprofesional(): number;
+
     //
     // Seguridad Social
     //

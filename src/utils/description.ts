@@ -1,5 +1,5 @@
 
-import { formatNumberEsp } from "../utils";
+import { formatNumberEsp } from "../utils/utils";
 
 type Options = {
     quotes?: boolean,

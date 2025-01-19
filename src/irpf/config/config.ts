@@ -11,8 +11,8 @@ export const years = [
 ] as const;
 
 export const configs: { [id: number]: Config } = {
-    2023: new Config2023(),
     2022: new Config2022(),
+    2023: new Config2023(),
     2024: new Config2024(),
 };
 
