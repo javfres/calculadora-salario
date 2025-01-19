@@ -29,6 +29,7 @@ Otras calculadoras:
 
 ## Changelog
 
+* Ene 2025: Cálculo de retribución flexible
 * Abr 2024: actualización de la calculadora para 2023
     * Los datos los iguales que en 2022 excepto los cambios en las bases de cotización. Son iguales: tramos, tipos y los mínimo de CyL.
     * Usando cálculo real de las cuotas integras y líquidas. En vez de usar los tramos de IRPF pre-calculados.
