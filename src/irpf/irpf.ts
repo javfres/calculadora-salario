@@ -471,7 +471,7 @@ export default class CalculadoraSalario {
             const cuota_total = cuota_integra.add(cuota_resto);
 
             this.description.line()
-                .text("C2: El tramo de la escala de gravamen general (estatal) para el mínimo personal y familiar es")
+                .text("C3: El tramo de la escala de gravamen general (estatal) para el mínimo personal y familiar es")
                 .euros(tramo.base_liquidable_hasta)
                 .text("cuya cuota íntegra es")
                 .euros(cuota_integra)
@@ -497,7 +497,7 @@ export default class CalculadoraSalario {
             const cuota_total = cuota_integra.add(cuota_resto);
 
             this.description.line()
-                .text("C3: El tramo de la escala de gravamen autonómica es")
+                .text("C2: El tramo de la escala de gravamen autonómica es")
                 .euros(tramo.base_liquidable_hasta)
                 .text("cuya cuota íntegra es")
                 .euros(cuota_integra)

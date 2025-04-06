@@ -6,7 +6,7 @@ export default class Config2022 implements Config {
     // https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537?changeLanguage=es
 
     salario_minimo_interprofesional(): number {
-        return 14000;
+        return 1000*14;
     }
 
     grupos_cotizacion(): GroupCotizacion[] {

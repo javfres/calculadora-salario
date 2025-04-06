@@ -4,7 +4,7 @@ import { Config, GroupCotizacion, Tipo, Tramo } from "./base";
 // https://sede.agenciatributaria.gob.es/Sede/manuales-practicos.html
 // https://sede.agenciatributaria.gob.es/Sede/Ayuda/24Presentacion/100.html
 
-export default class Config2024 implements Config {
+export default class Config2025 implements Config {
 
     salario_minimo_interprofesional(): number {
         return 1134*14;
@@ -15,38 +15,38 @@ export default class Config2024 implements Config {
         return [
             {
                 grupo: 1,
-                base_minima: 1847.40,
-                base_maxima: 4720.50
+                base_minima: 1929.00,
+                base_maxima: 4909.50
             },
             {
                 grupo: 2,
-                base_minima: 1532.10,
-                base_maxima: 4720.50
+                base_minima: 1599.60,
+                base_maxima: 4909.50
             },
             {
                 grupo: 3,
-                base_minima: 1332.90,
-                base_maxima: 4720.50
+                base_minima: 1391.70,
+                base_maxima: 4909.50
             },
             {
                 grupo: 4,
-                base_minima: 1323.00,
-                base_maxima: 4720.50
+                base_minima: 1381.20,
+                base_maxima: 4909.50
             },
             {
                 grupo: 5,
-                base_minima: 1323.00,
-                base_maxima: 4720.50
+                base_minima: 1381.20,
+                base_maxima: 4909.50
             },
             {
                 grupo: 6,
-                base_minima: 1323.00,
-                base_maxima: 4720.50
+                base_minima: 1381.20,
+                base_maxima: 4909.50
             },
             {
                 grupo: 7,
-                base_minima: 1323.00,
-                base_maxima: 4720.50
+                base_minima: 1381.20,
+                base_maxima: 4909.50
             },
         ];
     }
@@ -76,8 +76,8 @@ export default class Config2024 implements Config {
             },
             {
                 nombre: "Mecanismo de Equidad Intergeneracional (MEI)",
-                porcentaje: 0.12,
-                porcentaje_empresa: 0.58,
+                porcentaje: 0.13,
+                porcentaje_empresa: 0.67,
             }
         ];
     }

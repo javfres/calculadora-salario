@@ -83,6 +83,10 @@ function onUpdateConfig(config: ConfigContribuyente){
         t = new Table2()
         t.row("Total empresa").eur().value(calculator.a.total_empresa)
         t.row("Total estado").eur().value(calculator.a.dinero_estado)
+
+        t.row("Porcentaje total estado").per().value(100*calculator.a.dinero_estado/calculator.a.total_empresa)
+        t.row("Porcentaje total empleado").per().value(100*calculator.a.neto/calculator.a.total_empresa)
+
         tables.empresa = t;
 
     } else {

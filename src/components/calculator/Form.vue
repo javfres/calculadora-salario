@@ -7,6 +7,7 @@
            Modo avanzado  <Toogle></Toogle>
         </div> 
         -->
+
     
         <div class="thelabel">Año</div>
         <div class="theinput">
@@ -28,13 +29,13 @@
 
         <div class="thelabel">Bruto anual</div>
         <div class="theinput">
-            <input type="number" v-model="state.salarioA" step="1000" min="0">
-            <input type="number" v-model="state.salarioB" step="1000" min="0" v-if="['matri-conj', 'matri-ind'].includes(state.situacion_id)">
+            <NumberInput type="number" v-model="state.salarioA" step="1000" min="0"></NumberInput>
+            <NumberInput type="number" v-model="state.salarioB" step="1000" min="0" v-if="['matri-conj', 'matri-ind'].includes(state.situacion_id)"></NumberInput>
         </div>  
 
         <div class="thelabel">Ahorro</div>
         <div class="theinput">
-            <input type="number" v-model="state.ahorro" step="1000" min="0">
+            <NumberInput type="number" v-model="state.ahorro" step="1000" min="0"></NumberInput>
         </div>  
 
         <div class="thelabel">Edad</div>
@@ -68,6 +69,7 @@
 import { computed, reactive } from '@vue/reactivity';
 import { onMounted, watch, toRef } from 'vue';
 import {ConfigContribuyente, getSituacionFromID, situaciones, situacion_id_t, years, grupo_cotizacion_names} from '../../irpf/config/config';
+import NumberInput from './NumberInput.vue';
 
 export interface Props {
     start: ConfigContribuyente;
@@ -191,7 +193,7 @@ watch(() => state.ahorro, onUpdateInput)
         display: flex;
         gap: 8px;
 
-        input, select {
+        &>input, &>select {
             padding: 10px 10px;
             margin: 4px 0;
             box-sizing: border-box;
@@ -199,6 +201,15 @@ watch(() => state.ahorro, onUpdateInput)
             //flex-basis: 0;
             width: 0;
         }
+
+        &>div {
+            margin: 4px 0;
+            box-sizing: border-box;
+            flex: 1;
+            //flex-basis: 0;
+            width: 0;
+        }
+
     }
 }
 
