@@ -2,7 +2,6 @@
    <div class="input">
         <input
             type="text" v-model="value"
-            pattern="[0-9.,]*"
             @blur="blur"
         >
     </div>
@@ -11,47 +10,64 @@
 
 <script setup lang="ts">
 
+import Amount from '@/irpf/config/amount'
 import { Ref, ref, watch } from 'vue'
 
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue'])
-const value: Ref<string> = ref(`${props.modelValue}` || '')
 
-function propagate(val: number) {
+console.log('props', props.modelValue)
+
+const value: Ref<string> = ref((props.modelValue || Amount.Zero() ).getText())
+
+function propagate(val: Amount) {
     emit('update:modelValue', val)
 }
 
-function toNumber(val: string) {
-    val = val.trim().replace(/,/g, '.')
-    let newNumber = Number(val)
-    if (isNaN(newNumber)) {
-        newNumber = 0
-    }
-    return newNumber
+function toNumber(text: string) {
+    text = text.trim().replace(/,/g, '.')
+    console.log('toNumber', text)
+
+    const sums = text.split('+')
+    const val = sums.reduce((acc, sum) => {
+        const mults = sum.split('*')
+        const res = mults.reduce((acc, mult) => {
+            return acc * Number(mult)
+        }, 1)
+        return acc + res
+    }, 0)
+
+    return Number(val)
 }
 
-// If the new values is a number and its representation is the same as the string representation,
-// then propagate the value. We do this to avoid propagating the value when the user is typing.
+function toNumberOr0(text: string) {
+    const val = toNumber(text)
+    return isNaN(val) ? 0 : val
+}
+
+// To avoid propagating the value when the user is typing
+// only propagate when the value is a number
 watch(value, (newValue:string) => {
     newValue = newValue.trim().replace(/,/g, '.')
 
     const newNumber = toNumber(newValue)
-
-    if(`${newValue}` === `${newNumber}`) {
-        propagate(newNumber)
-    }
-})
-
-watch(() => props.modelValue, (newValue: number) => {
-    if (`${newValue}` === `${toNumber(value.value)}`) {
+    if (isNaN(newNumber)) {
         return
     }
-    value.value = `${newValue}`
+
+    propagate(Amount.fromNumber(newNumber)) 
+})
+
+watch(() => props.modelValue, (newValue: Amount) => {
+    if (`${newValue.getValue()}` === `${toNumber(value.value)}`) {
+        return
+    }
+    value.value = newValue.getText()
 })
 
 const blur = () => {
-    propagate(toNumber(value.value))
+    propagate(new Amount(value.value))
 }
 
 </script>

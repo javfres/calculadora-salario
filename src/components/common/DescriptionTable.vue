@@ -9,7 +9,7 @@
 
 import DescriptionGroup from './DescriptionGroup.vue';
 
-import { Description } from '@/irpf/description';
+import { Description } from '@/utils/description';
 
 interface Props {
     descriptions: Description[];

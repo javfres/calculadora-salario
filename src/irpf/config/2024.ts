@@ -172,5 +172,35 @@ export default class Config2024 implements Config {
             {base_liquidable_hasta: 300000, cuota_integra: 35940, porcentaje_resto: 14},
         ];
     }
-  
+
+    //
+    // Planes de pensiones
+    //
+    plan_pensiones_max(): number {
+        return 1500;
+    }
+
+    //
+    // Retribución flexible
+    //
+    // https://factorialhr.es/blog/retribucion-flexible-empresa-espana/
+    flexible_max_transporte(): number {
+        return 1500;
+    }
+    flexible_max_guarderia(): number {
+        return 0; // No hay límite
+    }
+    flexible_max_seguro(): number {
+        return 500
+    }
+    flexible_max_percentage(): number {
+        return 0.3
+    }
+    flexible_max_restaurante_dia(): number {
+        return 11;
+    }
+    flexible_dias_laborables(): number {
+        return 220; // ????
+    }
+
 }

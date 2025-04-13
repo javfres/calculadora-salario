@@ -78,6 +78,9 @@ function onUpdateConfig(config: ConfigContribuyente){
         t.row("Sueldo neto").eur().value(calculator.a.neto)
         t.row("Sueldo neto mensual").eur().value(calculator.a.neto_mes)
         t.row("Porcentaje del bruto en neto").per().value(100*calculator.a.neto/calculator.a.bruto)
+        if(calculator.a.especie > 0){
+            t.row("Pagos en especie (retribución flexible)").eur().value(calculator.a.especie)
+        }
         tables.empleado = t;
 
         t = new Table2()
@@ -119,12 +122,14 @@ function onUpdateConfig(config: ConfigContribuyente){
         t.row("Porcentaje IRPF en nómina").per().value(calculator.a.irpf_porcentaje).value(calculator.b.irpf_porcentaje)
         t.row("Sueldo neto total").eur().value(calculator.a.neto+calculator.b.neto)
         t.row("Sueldo neto").eur().value(calculator.a.neto).value(calculator.b.neto)
-        t.row("Sueldo neto mensual").eur().value(calculator.a.neto_mes).value(calculator.b.neto_mes)
+        t.row("Sueldo neto mensual").eur().value(calculator.a.neto_mes).value(0)
 
         t.row("Total neto").eur().value(calculator.a.neto+calculator.b.neto)
         t.row("Total neto mensual").eur().value(calculator.a.neto_mes+calculator.b.neto_mes) 
         t.row("Porcentaje del bruto en neto").per().value(100*calculator.a.neto/calculator.a.bruto).value(100*calculator.b.neto/calculator.b.bruto)
-
+        if(calculator.a.especie > 0){
+            t.row("Pagos en especie (retribución flexible)").eur().value(calculator.a.especie)
+        }
 
         tables.empleado = t;
 

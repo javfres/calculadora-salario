@@ -1,3 +1,4 @@
+import Amount from "./amount";
 import { situacion_id_t } from "./config";
 
 export type GroupCotizacion = {
@@ -25,12 +26,19 @@ export type Tramo = {
 export type ConfigContribuyente = {
     year: number;
     grupo_cotizacion: number;
-    salarioA: number;
-    salarioB: number;
+    salarioA: Amount;
+    salarioB: Amount;
     situacion_id: situacion_id_t;
     edad?: number;
     hijos?: number;
-    ahorro: number;
+    ahorro: Amount;
+    plan_pensiones: Amount;
+
+    flexible_restaurante: Amount;
+    flexible_transporte: Amount;
+    flexible_guarderia: Amount;
+    flexible_seguro: Amount;
+    flexible_seguro_personas: number;
 }
 
 
@@ -66,4 +74,14 @@ export interface Config {
 
     escala_gravamen_estatal_ahorro(): Tramo[];
     escala_gravamen_autonomico_ahorro(): Tramo[];
+
+    plan_pensiones_max(): number;
+
+    // Configuración de retribución flexible
+    flexible_max_restaurante_dia(): number;
+    flexible_dias_laborables(): number;
+    flexible_max_transporte(): number;
+    flexible_max_guarderia(): number;
+    flexible_max_seguro(): number;
+    flexible_max_percentage(): number;
 }

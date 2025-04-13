@@ -3,27 +3,27 @@
 
         <div class="thelabel">Bruto anual</div>
         <div class="theinput">
-            <input type="number" v-model="state.salario" step="1000" min="0">
+            <NumberInput type="number" v-model="state.salario" step="1000" min="0"></NumberInput>
         </div>  
 
         <div class="thelabel">restaurante</div>
         <div class="theinput">
-            <input type="number" v-model="state.restaurante" step="10" min="0">
+            <NumberInput type="number" v-model="state.restaurante" step="10" min="0"></NumberInput>
         </div>  
 
         <div class="thelabel">transporte</div>
         <div class="theinput">
-            <input type="number" v-model="state.transporte" step="10" min="0">
+            <NumberInput type="number" v-model="state.transporte" step="10" min="0"></NumberInput>
         </div> 
 
         <div class="thelabel">guarderia</div>
         <div class="theinput">
-            <input type="number" v-model="state.guarderia" step="10" min="0">
+            <NumberInput type="number" v-model="state.guarderia" step="10" min="0"></NumberInput>
         </div> 
 
         <div class="thelabel">seguro</div>
         <div class="theinput">
-            <input type="number" v-model="state.seguro" step="10" min="0">
+            <NumberInput type="number" v-model="state.seguro" step="10" min="0"></NumberInput>
         </div> 
 
     </div>
@@ -32,10 +32,11 @@
 
 <script setup lang="ts">
 
-import { computed, reactive } from '@vue/reactivity';
+import {  reactive } from '@vue/reactivity';
 import { onMounted, watch, toRef } from 'vue';
-import {ConfigContribuyente, getSituacionFromID, situaciones, situacion_id_t, years, grupo_cotizacion_names} from '../../irpf/config/config';
 import { ConfigFlexibleContribuyente } from '@/flexible/config/config';
+import NumberInput from '../calculator/NumberInput.vue';
+import Amount from '@/irpf/config/amount';
 
 export interface Props {
     start: ConfigFlexibleContribuyente;
@@ -45,11 +46,11 @@ const props = defineProps<Props>();
 
 
 interface State {
-    salario: number;
-    restaurante: number;
-    transporte: number;
-    guarderia: number;
-    seguro: number;
+    salario: Amount;
+    restaurante: Amount;
+    transporte: Amount;
+    guarderia: Amount;
+    seguro: Amount;
 }
 
 const state = reactive<State>({

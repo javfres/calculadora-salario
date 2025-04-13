@@ -53,8 +53,8 @@ export default class Config2023 implements Config {
     tipos(): Tipo[] {
         return [
             {
-                nombre: "Contingencias comunes",
-                porcentaje: 4.8,
+                nombre: "Contingencias comunes", // MEI excluido, hay veces que se pone como 4.8 (porque se incluye el MEI)
+                porcentaje: 4.7,
                 porcentaje_empresa: 23.60,
             },
             {
@@ -170,4 +170,34 @@ export default class Config2023 implements Config {
         ];
     }
   
+    //
+    // Planes de pensiones
+    //
+    plan_pensiones_max(): number {
+        return 1500;
+    }
+
+    //
+    // Retribución flexible
+    //
+    // https://factorialhr.es/blog/retribucion-flexible-empresa-espana/
+    flexible_max_transporte(): number {
+        return 1500;
+    }
+    flexible_max_guarderia(): number {
+        return 0; // No hay límite
+    }
+    flexible_max_seguro(): number {
+        return 500
+    }
+    flexible_max_percentage(): number {
+        return 0.3
+    }
+    flexible_max_restaurante_dia(): number {
+        return 11;
+    }
+    flexible_dias_laborables(): number {
+        return 220; // ????
+    }
+
 }

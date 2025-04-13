@@ -7,7 +7,7 @@ type Options = {
 }
 
 type Item = {
-    type: 'text' | 'euros' | 'percentage' | 'symbol' | 'number'
+    type: 'text' | 'euros' | 'percentage' | 'symbol' | 'number' | 'hr'
     text?: string,
     value?: number,
     options: Options,
@@ -91,13 +91,16 @@ export class Line implements LineOrGroup {
         return this.symbol(",");
     }
 
-    toHtml(): string {
+    isHr(): boolean {
+        return this.items.length == 1 && this.items[0].type == 'hr';
+    }
 
+    toHtml(): string {
         if(this.items[this.items.length-1].type != 'symbol') {
             this.dot();
         }
 
-        let html = "";
+        let html = "<div>";
 
         for(const {type, text, value, options} of this.items) {
 
@@ -125,6 +128,8 @@ export class Line implements LineOrGroup {
             html += res;
         }
 
+        html += "</div>";
+
         return html;
     }
 
@@ -134,6 +139,11 @@ export class Line implements LineOrGroup {
 
     isGroup(){
         return false;
+    }
+
+    hr(){
+        this.push({type: 'hr'});
+        return this;
     }
 
 }
@@ -191,6 +201,10 @@ export class Description {
 
     line(): Line {
         return this.current.line()
+    }
+
+    hr() {
+        this.line().hr();
     }
 
 }
