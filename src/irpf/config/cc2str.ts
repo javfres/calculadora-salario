@@ -1,18 +1,9 @@
 
+import Amount from "./amount";
 import { ConfigContribuyente } from "./base";
 import { situacion_id_t, years } from "./config";
 
 const lastYear = years[0];
-
-function salary2str(s: number): string {
-
-    if(s > 1000 && s % 1000 === 0){
-        return Math.floor(s/1000) + "k";
-    }
-
-    return Math.floor(s) + "";
-
-}
 
 export function cc2str(cc: ConfigContribuyente): string {
 
@@ -27,10 +18,10 @@ export function cc2str(cc: ConfigContribuyente): string {
 
     let res = l;
 
-    res += salary2str(cc.salarioA);
+    res += cc.salarioA.getOptimizedText()
 
-    if(cc.salarioB){
-        res += "b" + salary2str(cc.salarioB);
+    if(cc.salarioB.getValue()){
+        res += "b" +  cc.salarioB.getOptimizedText();
     }
 
     if(cc.edad){
@@ -49,32 +40,41 @@ export function cc2str(cc: ConfigContribuyente): string {
         res += "g" + cc.grupo_cotizacion;
     }
 
-    if(cc.ahorro){
-        res += "a" + salary2str(cc.ahorro);
+    if(cc.ahorro.getValue()){
+        res += "a" + cc.ahorro.getOptimizedText();
+    }
+
+    if(cc.plan_pensiones.getValue()){
+        res += "p" + cc.plan_pensiones.getOptimizedText();
+    }
+
+    if(cc.flexible_restaurante.getValue()){
+        res += "fr" + cc.flexible_restaurante.getOptimizedText();
+    }
+
+    if(cc.flexible_transporte.getValue()){
+        res += "ft" + cc.flexible_transporte.getOptimizedText();
+    }
+
+    if(cc.flexible_guarderia.getValue()){
+        res += "fg" + cc.flexible_guarderia.getOptimizedText();
+    }
+
+    if(cc.flexible_seguro.getValue()){
+        res += "fs" + cc.flexible_seguro.getOptimizedText();
+    }
+
+    if(cc.flexible_seguro_personas > 1){
+        res += "fp" + cc.flexible_seguro_personas;
     }
 
     return res;
-
-}
-
-function str2salary(s?: string): number {
-
-    if(!s) return 0;
-    
-    const res = /([0-9]+)(k?)/.exec(s);
-    if(!res) return 0;
-
-    let num = +res[1];
-
-    if(res[2]) num *= 1000;
-
-    return num;
-
 }
 
 export function str2cc(q: string): ConfigContribuyente|null {
 
-    const res = /([scim])([0-9]+k?)(?:b([0-9]+k?))?(?:e([0-9]+))?(?:h([0-9]+))?(?:y([0-9]+))?(?:g([0-9]+))?(?:a([0-9]+k?))?/.exec(q);
+    const res = /([scim])([0-9.+*]+)(?:b([0-9.+*]+))?(?:e([0-9]+))?(?:h([0-9]+))?(?:y([0-9]+))?(?:g([0-9]+))?(?:a([0-9.+*]+))?(?:p([0-9.+*]+))?(?:fr([0-9.+*]+))?(?:ft([0-9.+*]+))?(?:fg([0-9.+*]+))?(?:fs([0-9.+*]+))?(?:fp([0-9]+))?/i.exec(q);
+    
     if(!res) return null;
 
     const situacion_id: situacion_id_t = ((x:string)=>{
@@ -87,19 +87,20 @@ export function str2cc(q: string): ConfigContribuyente|null {
         }
     })(res[1]);
 
-    const salarioA = str2salary(res[2]);
-
-    const salarioB = str2salary(res[3]);
-
+    const salarioA = new Amount(res[2]||"0");
+    const salarioB = new Amount(res[3]||"0");
     const edad = +(res[4]||18);
-
     const hijos = +(res[5]||0);
-
     const year = +(res[6]||lastYear);
-
     const grupo_cotizacion = +(res[7]||1);
+    const ahorro = new Amount(res[8]||"0");
 
-    const ahorro = str2salary(res[8]);
+    const plan_pensiones = new Amount(res[9]||"0");
+    const flexible_restaurante = new Amount(res[10]||"0");
+    const flexible_transporte = new Amount(res[11]||"0");
+    const flexible_guarderia = new Amount(res[12]||"0");
+    const flexible_seguro = new Amount(res[13]||"0");
+    const flexible_seguro_personas = +(res[14]||"1"); 
 
     return {
         year,
@@ -110,6 +111,12 @@ export function str2cc(q: string): ConfigContribuyente|null {
         edad,
         hijos,
         ahorro,
+        plan_pensiones,
+        flexible_restaurante,
+        flexible_transporte,
+        flexible_guarderia,
+        flexible_seguro,
+        flexible_seguro_personas,
     }
 }
 

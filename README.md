@@ -29,6 +29,10 @@ Otras calculadoras:
 
 ## Changelog
 
+* Abr 2025: actualización para renta 2024
+    * Añadido el MEI, actualizado SMI
+    * Añadido desgravación por plan de pensiones
+    * Refactorizado código de retribución flexible
 * Ene 2025: Cálculo de retribución flexible
 * Abr 2024: actualización de la calculadora para 2023
     * Los datos los iguales que en 2022 excepto los cambios en las bases de cotización. Son iguales: tramos, tipos y los mínimo de CyL.
@@ -37,6 +41,7 @@ Otras calculadoras:
 
 
 ## Project setup
+
 ```
 npm install
 ```
@@ -51,6 +56,16 @@ npm run serve
 npm run build
 ```
 
-### TODO
+### Update vue
 
-* Mover smi a fichero independiente 2025 16576
+
+```
+npm update -g @vue/cli
+```
+
+
+### TODO
+
+* Mover smi a fichero independiente 2025 1184*14 = 16576
+* Añadir deducciones, eg plan de pensiones
+* https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/10721/10957/9932/4315

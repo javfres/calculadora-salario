@@ -3,10 +3,15 @@
         <div class="row" v-for="item of group.items" :key="item.id">
 
             <template v-if="item.isLine()">
-                <div v-html="(item as Line).toHtml()"></div>
+
+
+                <hr v-if="(item as Line).isHr()" />
+                <div v-else v-html="(item as Line).toHtml()"></div>
+
+
             </template>
             <template v-else>
-                <DescriptionGroup :group="item"></DescriptionGroup>
+                <DescriptionGroup :group="(item as Group)"></DescriptionGroup>
             </template>
 
         </div>
@@ -16,36 +21,40 @@
   
 <script setup lang="ts">
 
-import { Group, Line } from '@/irpf/description';
+import { Group, Line } from '@/utils/description';
 
 interface Props {
     group: Group
+    isMain: boolean
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 </script>
 
-<style lang="scss" scoped >
+<style lang="scss" scoped>
 
-.group {
+.row {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 2px;
 
-    .row {
-        display: flex;
-        flex-direction: row;
-        margin-bottom: 2px;
+    :deep(.euros), :deep(.percentage) {
+        font-weight: bold;
+        color: rgb(94, 40, 25);
+    }
 
-        :deep(.euros), :deep(.percentage) {
-            font-weight: bold;
-            color: rgb(94, 40, 25);
-        }
-
-        .group {
-            margin-left: 20px;
-            margin-bottom: 10px;
-        }
-
+    hr {
+        width: 100%;
     }
 }
+
+
+.row {
+    .group {
+        margin-left: 20px;
+    }
+}
+
 
 </style>

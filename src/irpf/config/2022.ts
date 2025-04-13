@@ -6,7 +6,7 @@ export default class Config2022 implements Config {
     // https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537?changeLanguage=es
 
     salario_minimo_interprofesional(): number {
-        return 14000;
+        return 1000*14;
     }
 
     grupos_cotizacion(): GroupCotizacion[] {
@@ -162,6 +162,34 @@ export default class Config2022 implements Config {
             {base_liquidable_hasta: 200000, cuota_integra: 22440, porcentaje_resto: 13.5},
         ];
     }
+   
+    //
+    // Planes de pensiones
+    //
+    plan_pensiones_max(): number {
+        return 1500;
+    }
 
-    
+    //
+    // Retribución flexible
+    //
+    // https://factorialhr.es/blog/retribucion-flexible-empresa-espana/
+    flexible_max_transporte(): number {
+        return 1500;
+    }
+    flexible_max_guarderia(): number {
+        return 0; // No hay límite
+    }
+    flexible_max_seguro(): number {
+        return 500
+    }
+    flexible_max_percentage(): number {
+        return 0.3
+    }
+    flexible_max_restaurante_dia(): number {
+        return 11;
+    }
+    flexible_dias_laborables(): number {
+        return 220; // ????
+    }   
 }

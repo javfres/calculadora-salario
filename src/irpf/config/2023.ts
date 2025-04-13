@@ -4,7 +4,7 @@ import { Config, GroupCotizacion, Tipo, Tramo } from "./base";
 export default class Config2023 implements Config {
 
     salario_minimo_interprofesional(): number {
-        return 15120;
+        return 1080*14;
     }
 
     // https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537?changeLanguage=es
@@ -53,8 +53,8 @@ export default class Config2023 implements Config {
     tipos(): Tipo[] {
         return [
             {
-                nombre: "Contingencias comunes",
-                porcentaje: 4.8,
+                nombre: "Contingencias comunes", // MEI excluido, hay veces que se pone como 4.8 (porque se incluye el MEI)
+                porcentaje: 4.7,
                 porcentaje_empresa: 23.60,
             },
             {
@@ -72,16 +72,23 @@ export default class Config2023 implements Config {
                 porcentaje: 0,
                 porcentaje_empresa: 0.2,
             },
+            {
+                nombre: "Mecanismo de Equidad Intergeneracional (MEI)",
+                porcentaje: 0.1,
+                porcentaje_empresa: 0.5,
+            }
+
         ];
     }
 
+    // https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-ayuda-presentacion/irpf-2023/8-cumplimentacion-irpf/8_3-adecuacion-impuesto-circunstancias-personales-familiares/8_3_2-minimo-contribuyente.html
     minimo_general(): number {
         return 5550;
     }
 
     minimo_edad(edad: number):number{
         if(edad >= 75) {
-            return 6950-this.minimo_general();
+            return 8100-this.minimo_general();
         } else if(edad >= 65) {
             return 6700-this.minimo_general();
         } else {
@@ -163,4 +170,34 @@ export default class Config2023 implements Config {
         ];
     }
   
+    //
+    // Planes de pensiones
+    //
+    plan_pensiones_max(): number {
+        return 1500;
+    }
+
+    //
+    // Retribución flexible
+    //
+    // https://factorialhr.es/blog/retribucion-flexible-empresa-espana/
+    flexible_max_transporte(): number {
+        return 1500;
+    }
+    flexible_max_guarderia(): number {
+        return 0; // No hay límite
+    }
+    flexible_max_seguro(): number {
+        return 500
+    }
+    flexible_max_percentage(): number {
+        return 0.3
+    }
+    flexible_max_restaurante_dia(): number {
+        return 11;
+    }
+    flexible_dias_laborables(): number {
+        return 220; // ????
+    }
+
 }

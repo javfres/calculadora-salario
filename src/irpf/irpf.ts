@@ -13,6 +13,7 @@ export class Resultado {
     bruto = 0;
     seguridad_social = 0;
     neto = 0;
+    especie = 0;
     neto_mes = 0;
     seguridad_social_empresa = 0;  
     total_empresa = 0;
@@ -21,6 +22,14 @@ export class Resultado {
     irpf_porcentaje = 0;
     dinero_estado = 0;
 }
+
+type ResultadoFlexible = {
+    // Dinero que se cobra como especie y está libre de impuestos
+    especie_exento: Dinero.Dinero;
+    // Dinero extra gastado que se debe pagar irpf
+    especie_extra: Dinero.Dinero;
+}
+
 
 export default class CalculadoraSalario {
 
@@ -42,8 +51,8 @@ export default class CalculadoraSalario {
 
         const configContribuyente = this.configContribuyente;
 
-        const bruto_a = configContribuyente.salarioA;
-        const bruto_b = configContribuyente.salarioB;
+        const bruto_a = configContribuyente.salarioA.getValue();
+        const bruto_b = configContribuyente.salarioB.getValue();
 
         const has_b = situaciones.find(s => s.id === configContribuyente.situacion_id)?.has_b ?? false;
 
@@ -80,6 +89,7 @@ export default class CalculadoraSalario {
         let d_seguridad_social_empresa_a = D(0);
         let d_seguridad_social_empresa_b = D(0);
 
+        this.description.hr()
         this.description.line().text("Calculo de la seguridad social:")
         this.description.startGroup();
 
@@ -185,10 +195,18 @@ export default class CalculadoraSalario {
         //
         // Calculo IRPF
         //
+        this.description.hr()
         this.description.line().text("Calculo del IRPF").symbol(":");
         this.description.startGroup();
 
         const mpf = this.calcularMinimoPersonalFamiliar();
+
+        const {
+            especie_exento: d_flexible,
+            especie_extra: d_flexible_extra,
+        } = this.calcular_flexible()
+
+        this.a.especie = d_flexible.add(d_flexible_extra).toRoundedUnit(2);
 
         let d_irpf_a = D(0);
         let d_irpf_b = D(0);
@@ -198,12 +216,12 @@ export default class CalculadoraSalario {
 
             this.description.line().text("Calculo de IRPF para A").symbol(":");
             this.description.startGroup();
-            d_irpf_a = this.calcular_irpf(d_bruto_a, d_seguridad_social_a, mpf, this.a);
+            d_irpf_a = this.calcular_irpf(d_bruto_a, d_seguridad_social_a, mpf, d_flexible, true, this.a);
             this.description.endGroup();
 
             this.description.line().text("Calculo de IRPF para B").symbol(":");
             this.description.startGroup();
-            d_irpf_b = this.calcular_irpf(d_bruto_b, d_seguridad_social_b, mpf, this.b);
+            d_irpf_b = this.calcular_irpf(d_bruto_b, d_seguridad_social_b, mpf, D(0), false, this.b);
             this.description.endGroup();
 
         } else if (configContribuyente.situacion_id === "matri-conj") {
@@ -213,14 +231,14 @@ export default class CalculadoraSalario {
 
             this.description.line().text("Calculo de IRPF conjunto").symbol(":");
             this.description.startGroup();
-            d_irpf_ab = this.calcular_irpf(d_bruto, d_seguridad_social, mpf, this.a);
+            d_irpf_ab = this.calcular_irpf(d_bruto, d_seguridad_social, mpf, d_flexible, true, this.a);
             this.description.endGroup();
 
         } else {
 
             this.description.line().text("Calculo de IRPF").symbol(":");
             this.description.startGroup();
-            d_irpf_a = this.calcular_irpf(d_bruto_a, d_seguridad_social_a, mpf, this.a);
+            d_irpf_a = this.calcular_irpf(d_bruto_a, d_seguridad_social_a, mpf, d_flexible, true, this.a);
             this.description.endGroup();
 
         }
@@ -231,6 +249,7 @@ export default class CalculadoraSalario {
         // Neto
         //
 
+        this.description.hr()
         this.description.line().text("Calculo del sueldo neto").symbol(":");
         this.description.startGroup();
 
@@ -239,24 +258,24 @@ export default class CalculadoraSalario {
             const reparto = this.reparto_neto_conjunta(d_bruto_a, d_bruto_b, d_seguridad_social_a, d_seguridad_social_b, d_irpf_ab, this.a, this.b);
             d_irpf_a = reparto.d_irpf_a;
             d_irpf_b = reparto.d_irpf_b;
-            this.calculo_neto(d_bruto_a, d_seguridad_social_a, d_irpf_a, this.a);
-            this.calculo_neto(d_bruto_b, d_seguridad_social_b, d_irpf_b, this.b);
+            this.calculo_neto(d_bruto_a, d_seguridad_social_a, d_irpf_a, d_flexible, d_flexible_extra, this.a);
+            this.calculo_neto(d_bruto_b, d_seguridad_social_b, d_irpf_b, D(0), D(0), this.b);
 
         } else if(configContribuyente.situacion_id === "matri-ind"){
-            this.calculo_neto(d_bruto_a, d_seguridad_social_a, d_irpf_a, this.a);
-            this.calculo_neto(d_bruto_b, d_seguridad_social_b, d_irpf_b, this.b);
+            this.calculo_neto(d_bruto_a, d_seguridad_social_a, d_irpf_a, d_flexible, d_flexible_extra, this.a);
+            this.calculo_neto(d_bruto_b, d_seguridad_social_b, d_irpf_b, D(0), D(0), this.b);
         } else {
-            this.calculo_neto(d_bruto_a, d_seguridad_social_a, d_irpf_a, this.a);
+            this.calculo_neto(d_bruto_a, d_seguridad_social_a, d_irpf_a, d_flexible, d_flexible_extra, this.a);
         }
-
-
-
         this.description.endGroup();
+
+
 
         //
         // Total empresa
         //
 
+        this.description.hr()
         this.a.total_empresa = d_bruto_a.add(d_seguridad_social_empresa_a).toRoundedUnit(2);
         this.b.total_empresa = d_bruto_b.add(d_seguridad_social_empresa_b).toRoundedUnit(2);
 
@@ -274,13 +293,11 @@ export default class CalculadoraSalario {
         }
 
 
-        
-        
-
         //
         // Total estado
         //
 
+        this.description.hr()
         this.description.line().text("Calculo de los impuestos que el estado ingresa").symbol(":");
         this.description.startGroup();
 
@@ -322,17 +339,14 @@ export default class CalculadoraSalario {
 
             this.description.endGroup()
         }
-
-        
-
+        this.description.endGroup();
 
         //
         // Ahorro
         //
-        const d_ahorro = D(configContribuyente.ahorro);
+        const d_ahorro = D(configContribuyente.ahorro.getValue());
         if (d_ahorro.greaterThan(D(0))){
-
-
+            this.description.hr()
             this.description.line().text("Calculando ahorro (independiente del cálculo del salario)").symbol(":");
 
             this.description.startGroup()
@@ -471,7 +485,7 @@ export default class CalculadoraSalario {
             const cuota_total = cuota_integra.add(cuota_resto);
 
             this.description.line()
-                .text("C2: El tramo de la escala de gravamen general (estatal) para el mínimo personal y familiar es")
+                .text("C3: El tramo de la escala de gravamen general (estatal) para el mínimo personal y familiar es")
                 .euros(tramo.base_liquidable_hasta)
                 .text("cuya cuota íntegra es")
                 .euros(cuota_integra)
@@ -497,7 +511,7 @@ export default class CalculadoraSalario {
             const cuota_total = cuota_integra.add(cuota_resto);
 
             this.description.line()
-                .text("C3: El tramo de la escala de gravamen autonómica es")
+                .text("C2: El tramo de la escala de gravamen autonómica es")
                 .euros(tramo.base_liquidable_hasta)
                 .text("cuya cuota íntegra es")
                 .euros(cuota_integra)
@@ -620,7 +634,7 @@ export default class CalculadoraSalario {
         return cuota_autonomica.add(cuota_estatal);
     }
 
-    calcular_irpf(d_bruto: Dinero.Dinero, d_seguridad_social: Dinero.Dinero, mpf: Dinero.Dinero, r: Resultado): Dinero.Dinero {
+    calcular_irpf(d_bruto: Dinero.Dinero, d_seguridad_social: Dinero.Dinero, mpf: Dinero.Dinero, d_flexible: Dinero.Dinero, usePlanPensiones: boolean, r: Resultado): Dinero.Dinero {
  
         let d_base_imponible = d_bruto;
         d_base_imponible = d_base_imponible.subtract(d_seguridad_social)
@@ -635,16 +649,43 @@ export default class CalculadoraSalario {
             d_base_imponible = D(0);
         }
 
+        if (d_flexible.greaterThan(D(0))){
+            d_base_imponible = d_base_imponible.subtract(d_flexible);
+        }
+
+        let d_plan_pensiones = D(0);
+        if (usePlanPensiones){ // Use different flag for plan_pensiones
+            d_plan_pensiones = this.calcular_plan_pensiones();
+            d_base_imponible = d_base_imponible.subtract(d_plan_pensiones);
+        }
+        
+
         this.description.line()
             .text("La base imponible sobre la que se aplica el IRPF es")
             .euros(d_base_imponible)
             .dot()
             .text("Esta base es el bruto de")
             .euros(d_bruto)
-            .text("menos la contribución a la seguridad social")
+            .text("menos:")
+
+        this.description.startGroup()
+        this.description.line()
+            .text("menos la cotización a la seguridad social de ")
             .euros(d_seguridad_social)
-            .text(`y menos "otros gastos deducibles"`)
-            .euros(otros_gastos);
+        this.description.line()
+            .text("menos otros gastos deducibles")
+            .euros(otros_gastos)
+
+        if (d_plan_pensiones.greaterThan(D(0))){
+            this.description.line()
+                .text("menos el plan de pensiones")
+                .euros(d_plan_pensiones);
+        }
+        if (d_flexible.greaterThan(D(0))){
+            this.description.line()
+                .text("menos el ahorro flexible")
+                .euros(d_flexible);
+        }
 
         if (mpf.greaterThan(d_base_imponible)){
             this.description.line()
@@ -677,6 +718,176 @@ export default class CalculadoraSalario {
         return d_irpf;
     }
 
+    calcular_flexible(): ResultadoFlexible {
+
+        this.description.line().text("Calculando el ahorro flexible:").
+        text("El ahorro flexible son retribuciones en especie que no tributan en el IRPF,")
+        .text("por lo que se restan de la base imponible (aunque aparecen en la nómina y hay que cotizar por ellos)")
+
+        this.description.startGroup();
+
+        const result = (() => {
+
+            const salario = this.configContribuyente.salarioA.getValue();
+            const smi = this.config.salario_minimo_interprofesional();
+
+            let restaurante = this.configContribuyente.flexible_restaurante.getValue();
+            let transporte = this.configContribuyente.flexible_transporte.getValue();
+            const guarderia = this.configContribuyente.flexible_guarderia.getValue();
+            let seguro =  this.configContribuyente.flexible_seguro.getValue();
+
+            if ((restaurante + transporte + guarderia + seguro) === 0){
+                this.description.line().text("No hay gastos en retribuciones en especie")
+                return;
+            }
+
+
+            this.description.line().text("El salario bruto es de ").euros(salario)
+
+            if (salario < smi) {
+                this.description.line().text("El salario es menor que el salario mínimo inter-profesional de ").euros(smi)
+                .text(", por lo que no se puede aplicar el ahorro")
+                return;
+            }
+    
+            let extra_restaurante = 0;
+            let extra_transporte = 0;
+            let extra_seguro = 0;
+    
+            // Restaurante
+            const max_restaurante = this.config.flexible_max_restaurante_dia() * this.config.flexible_dias_laborables();
+            if (restaurante > 0){
+                this.description.line().text("Has gastado ").euros(restaurante).text(" en restaurante")
+                this.description.startGroup()
+    
+                this.description.line().text("El máximo permitido es de").euros(this.config.flexible_max_restaurante_dia())
+                    .text(" por día laborable, como hay ").number(this.config.flexible_dias_laborables())
+                    .text(" días laborables, el máximo permitido es de ").euros(max_restaurante)
+    
+                if (restaurante > max_restaurante) {
+                    extra_restaurante = restaurante - max_restaurante;
+                    restaurante = max_restaurante;
+                    this.description.line().text("Has gastado más de lo permitido en restaurante, sólo podrás desgravar el máximo permitido.")
+                    .text("El extra gastado es de ").euros(extra_restaurante)
+     
+                } else {
+                    this.description.line().text("Has gastado menos de lo permitido en restaurante")
+                }
+                this.description.endGroup()
+            }
+    
+            // Transporte
+            const max_transporte = this.config.flexible_max_transporte();
+            if (transporte > 0){
+                this.description.line().text("Has gastado ").euros(transporte).text(" en transporte")
+                this.description.startGroup()
+    
+                this.description.line().text("El máximo permitido es de").euros(max_transporte)
+    
+                if (transporte > max_transporte) {
+                    extra_transporte = transporte - max_transporte;
+                    transporte = max_transporte;
+                    this.description.line().text("Has gastado más de lo permitido en transporte, sólo podrás desgravar el máximo permitido.")
+                    .text("El extra gastado es de ").euros(extra_transporte)
+                } else {
+                    this.description.line().text("Has gastado menos de lo permitido en transporte")
+                }
+                this.description.endGroup()
+            }
+    
+            // Guardería
+            if (guarderia > 0){
+                this.description.line().text("Has gastado ").euros(guarderia).text(" en guardería")
+                this.description.startGroup()
+                this.description.line().text("No hay límite en guardería")
+                this.description.endGroup()
+            }
+    
+            // Seguro
+            let max_seguro = this.config.flexible_max_seguro();
+            if (seguro > 0){
+                this.description.line().text("Has gastado ").euros(seguro).text(" en seguro")
+                this.description.startGroup()
+    
+
+
+                const l = this.description.line().text("El máximo permitido es de")
+                    .euros(max_seguro).text("por persona y año")
+                if (this.configContribuyente.flexible_seguro_personas > 1){
+                    max_seguro = max_seguro * this.configContribuyente.flexible_seguro_personas;
+                    l.text(", como hay ").number(this.configContribuyente.flexible_seguro_personas)
+                    .text(" personas, el máximo permitido es de").euros(max_seguro)
+                }
+
+
+                if (seguro > max_seguro) {
+                    extra_seguro = seguro - max_seguro;
+                    seguro = max_seguro;
+                    this.description.line().text("Has gastado más de lo permitido en seguro, sólo podrás desgravar el máximo permitido.")
+                    .text("El extra gastado es de ").euros(extra_seguro)
+                } else {
+                    this.description.line().text("Has gastado menos de lo permitido en seguro")
+                }
+                this.description.endGroup()
+            }
+
+            const especie_exento = D(restaurante).add(D(transporte)).add(D(guarderia)).add(D(seguro));
+            const especie_extra = D(extra_restaurante).add(D(extra_transporte)).add(D(extra_seguro));
+
+            if (especie_exento.greaterThan(D(0))){
+                this.description.line().text("El ahorro flexible es de").euros(especie_exento)
+                .text("que no tributa en el IRPF porque está exento dentro de los límites establecidos de retribuciones en especie")
+            }
+
+            if(especie_extra.greaterThan(D(0))){
+                this.description.line().text("Además has gastado").euros(especie_extra)
+                .text("adicionales que no están exentas y que tributan en el IRPF, ")
+                .text("tu empresa pagará esos importes al proveedor correspondiente y además deberá retenerte el IRPF")
+            }
+
+            return {
+                especie_exento,
+                especie_extra,
+            }
+        })();
+    
+
+        this.description.endGroup()
+
+        if (!result) {
+            return {
+                especie_exento: D(0),
+                especie_extra: D(0),
+            }
+        }
+        return result;
+    }
+
+
+    calcular_plan_pensiones(): Dinero.Dinero {
+
+        let d = D(this.configContribuyente.plan_pensiones.getValue());
+        if (d.isZero()){
+            return d;
+        }
+
+        const l = this.description.line()
+            .text("Calculando desgravación por plan de pensiones")
+
+        if ( d.greaterThan(D(this.config.plan_pensiones_max()))){
+            l.text("Has aportado más de lo permitido en plan de pensiones")
+            .text("El máximo permitido es de").euros(D(this.config.plan_pensiones_max()))
+            d = D(this.config.plan_pensiones_max());
+        } else {
+            l.text("Has aportado").euros(d)
+            .text("en plan de pensiones que es menos del maximo permitido de")
+            .euros(D(this.config.plan_pensiones_max()))
+        }
+
+        this.description.line().text("");
+
+        return d;
+    }
 
     reparto_neto_conjunta(d_bruto_a: Dinero.Dinero, d_bruto_b: Dinero.Dinero, d_seguridad_social_a: Dinero.Dinero, d_seguridad_social_b: Dinero.Dinero, d_irpf: Dinero.Dinero, a: Resultado, b: Resultado): {d_irpf_a: Dinero.Dinero, d_irpf_b: Dinero.Dinero} {
 
@@ -705,11 +916,27 @@ export default class CalculadoraSalario {
 
 
 
-    calculo_neto(d_bruto: Dinero.Dinero, d_seguridad_social: Dinero.Dinero, d_irpf: Dinero.Dinero, r: Resultado): Dinero.Dinero {
+    calculo_neto(d_bruto: Dinero.Dinero, d_seguridad_social: Dinero.Dinero, d_irpf: Dinero.Dinero, d_flexible: Dinero.Dinero, d_flexible_extra: Dinero.Dinero, r: Resultado): Dinero.Dinero {
 
-        let d_neto = d_bruto.subtract(d_seguridad_social).subtract(d_irpf);
+        let d_neto = d_bruto.subtract(d_seguridad_social).subtract(d_irpf).subtract(d_flexible).subtract(d_flexible_extra);
 
-        if (d_neto.isNegative()){
+        const l = this.description.line()
+            .text("El salario bruto es de ")
+            .euros(d_bruto)
+            .text("menos la cotización a la seguridad social de")
+            .euros(d_seguridad_social)
+        if (d_flexible.greaterThan(D(0))){
+            l.text("menos el ahorro flexible de")
+            .euros(d_flexible.add(d_flexible_extra))
+            .text("que ya lo ha pagado la empresa");
+
+            if (d_flexible_extra.greaterThan(D(0))){
+                l.text("(").euros(d_flexible).text(" exento y ").euros(d_flexible_extra).text(" no exento )");
+            }
+        }
+
+
+        if (d_neto.isNegative() || d_neto.isZero()){
             d_neto = D(0);
         }   
 
@@ -718,9 +945,9 @@ export default class CalculadoraSalario {
         r.neto_mes = d_neto.divide(12).toRoundedUnit(2);    
 
         this.description.line()
-            .text("El salario neto es por tanto de")
+            .text("El salario neto (dinerado) es por tanto de")
             .euros(d_neto)
-            .text("y el neto mensual es de")
+            .text("y el neto mensual (dinerado) es de")
             .euros(r.neto_mes);
 
         // El porcentaje de irpf es sobre el bruto

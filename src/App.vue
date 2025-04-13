@@ -21,7 +21,7 @@ import Flexible from './components/flexible/Flexible.vue';
 const tab = ref('calculator');
 
 // This is the main year
-const year = 2023;
+const year = 2024;
 
 </script>
 

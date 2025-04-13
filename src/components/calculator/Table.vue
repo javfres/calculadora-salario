@@ -45,9 +45,10 @@ class Row {
     }
 
     value(v: string|number): Row {
-
         if (typeof v === "number") {
-            if (v != 0) {
+            if (isNaN(v) || v == 0) {
+                v = "-";
+            } else {
                 v = formatNumberEsp(v, this.type === "eur");
                 switch(this.type) {
                     case "eur":
@@ -57,8 +58,6 @@ class Row {
                         v += '%';
                         break;
                 }
-            } else {
-                v = "-";
             }
         }
 
