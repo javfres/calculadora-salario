@@ -29,6 +29,7 @@ Otras calculadoras:
 
 ## Changelog
 
+* May 2026: actualización para renta 2025 y valores de grupos, tipos y smi para 2026
 * Abr 2025: actualización para renta 2024
     * Añadido el MEI, actualizado SMI
     * Añadido desgravación por plan de pensiones
@@ -66,6 +67,5 @@ npm update -g @vue/cli
 
 ### TODO
 
-* Mover smi a fichero independiente 2025 1184*14 = 16576
 * Añadir deducciones, eg plan de pensiones
 * https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/10721/10957/9932/4315
