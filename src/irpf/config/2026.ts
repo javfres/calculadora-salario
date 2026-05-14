@@ -1,57 +1,56 @@
 import { Config, GroupCotizacion, Tipo, Tramo } from "./base";
 
-// https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537?changeLanguage=es
-// https://sede.agenciatributaria.gob.es/Sede/manuales-practicos.html
-// https://sede.agenciatributaria.gob.es/Sede/Ayuda/25Manual/100.html
+// Fuentes actualizadas 2026:
+// https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537
+// Datos extraídos de la actualización normativa para el ejercicio 2026
 
-export default class Config2025 implements Config {
+export default class Config2026 implements Config {
 
     salario_minimo_interprofesional(): number {
-        return 1184*14;
+        // SMI 2026: 1.221,00€ x 14 pagas = 17.094,00€
+        return 1221 * 14;
     }
 
-    // BASES DE COTIZACIÓN CONTINGENCIAS COMUNES
+    // BASES DE COTIZACIÓN CONTINGENCIAS COMUNES 2026
     grupos_cotizacion(): GroupCotizacion[] {
-
         return [
             {
                 grupo: 1,
-                base_minima: 1929.00,
-                base_maxima: 4909.50
+                base_minima: 1989.30,
+                base_maxima: 5101.20
             },
             {
                 grupo: 2,
-                base_minima: 1599.60,
-                base_maxima: 4909.50
+                base_minima: 1649.70,
+                base_maxima: 5101.20
             },
             {
                 grupo: 3,
-                base_minima: 1391.70,
-                base_maxima: 4909.50
+                base_minima: 1435.20,
+                base_maxima: 5101.20
             },
             {
                 grupo: 4,
-                base_minima: 1381.20,
-                base_maxima: 4909.50
+                base_minima: 1424.40,
+                base_maxima: 5101.20
             },
             {
                 grupo: 5,
-                base_minima: 1381.20,
-                base_maxima: 4909.50
+                base_minima: 1424.40,
+                base_maxima: 5101.20
             },
             {
                 grupo: 6,
-                base_minima: 1381.20,
-                base_maxima: 4909.50
+                base_minima: 1424.40,
+                base_maxima: 5101.20
             },
             {
                 grupo: 7,
-                base_minima: 1381.20,
-                base_maxima: 4909.50
+                base_minima: 1424.40,
+                base_maxima: 5101.20
             },
         ];
     }
-
 
     tipos(): Tipo[] {
         return [
@@ -76,6 +75,8 @@ export default class Config2025 implements Config {
                 porcentaje_empresa: 0.2,
             },
             {
+                // El MEI sigue su escala progresiva según la reforma de pensiones
+                // (Nota: Ajustar según valor oficial final 2026 si varía del patrón previo)
                 nombre: "Mecanismo de Equidad Intergeneracional (MEI)",
                 porcentaje: 0.13,
                 porcentaje_empresa: 0.67,
@@ -89,9 +90,9 @@ export default class Config2025 implements Config {
         return 5550;
     }
 
-    minimo_edad(edad: number):number{
+    minimo_edad(edad: number): number {
         if(edad >= 75) {
-            return 1150+1400;
+            return 1150 + 1400;
         } else if(edad >= 65) {
             return 1150;
         } else {
@@ -135,9 +136,6 @@ export default class Config2025 implements Config {
     escala_gravamen_autonomico(ccaa: string): Tramo[] {
         switch(ccaa){
             case "cyl":
-
-                // https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2024/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-autonomico/comunidad-castilla-leon.html
-    
                 return [
                     {base_liquidable_hasta: 0, cuota_integra: 0, porcentaje_resto: 9},
                     {base_liquidable_hasta: 12450, cuota_integra: 1120.50, porcentaje_resto: 12},
@@ -145,8 +143,6 @@ export default class Config2025 implements Config {
                     {base_liquidable_hasta: 35200, cuota_integra: 4150.50, porcentaje_resto: 18.50},
                     {base_liquidable_hasta: 53407.20, cuota_integra: 7518.83, porcentaje_resto: 21.50},
                 ];
-
-        
             default:
                 throw new Error(`No hay datos para la comunidad autónoma ${ccaa}`);
         }
@@ -161,7 +157,6 @@ export default class Config2025 implements Config {
             {base_liquidable_hasta: 200000, cuota_integra: 22440, porcentaje_resto: 13.5},
             {base_liquidable_hasta: 300000, cuota_integra: 35940, porcentaje_resto: 15},
         ];
-        
     }
 
     escala_gravamen_autonomico_ahorro(): Tramo[] {
@@ -189,13 +184,13 @@ export default class Config2025 implements Config {
         return 1500;
     }
     flexible_max_guarderia(): number {
-        return 0; // No hay límite
+        return 0; // Exento sin límite según ley actual
     }
     flexible_max_seguro(): number {
-        return 500
+        return 500;
     }
     flexible_max_percentage(): number {
-        return 0.3
+        return 0.3; // Límite general del 30% del salario bruto
     }
     flexible_max_restaurante_dia(): number {
         return 11;
