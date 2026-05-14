@@ -4,7 +4,7 @@ import { Config, GroupCotizacion, Tipo, Tramo } from "./base";
 // https://sede.agenciatributaria.gob.es/Sede/manuales-practicos.html
 // https://sede.agenciatributaria.gob.es/Sede/Ayuda/25Manual/100.html
 
-export default class Config2025 implements Config {
+export default class Config2026 implements Config {
 
     salario_minimo_interprofesional(): number {
         return 1184*14;
